@@ -32,8 +32,7 @@
             @foreach($pertanyaans as $pertanyaan)
             <tr>
                 <td>{{ $pertanyaan->id }}</td>
-                {{-- Memanggil nama kategori lewat relasi --}}
-                <td>{{ $pertanyaan->kategori->nama ?? '-' }}</td>
+                <td>{{ $pertanyaan->nama_kategori }}</td>
                 <td>{{ $pertanyaan->pertanyaan }}</td>
                 <td>{{ $pertanyaan->jawaban }}</td>
                 <td>{{ $pertanyaan->status }}</td>

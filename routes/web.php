@@ -16,3 +16,6 @@ Route::delete('/hapus-kategori/{kategori}', [KategoriController::class, 'delete'
 Route::get('/daftar-pertanyaan', [PertanyaanController::class, 'tampil']);
 Route::get('/tambah-pertanyaan', [PertanyaanController::class, 'create']);
 Route::post('/simpan-pertanyaan', [PertanyaanController::class, "simpan"]);
+Route::get('/ubah-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'ubah']);
+Route::put('/update-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'update']);
+Route::delete('/hapus-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'delete']);
