@@ -8,9 +8,11 @@ use App\Http\Controllers\PertanyaanController;
 Route::get('/daftar-kategori', [KategoriController::class, 'tampil']);
 Route::get('/tambah-kategori', [KategoriController::class, 'create']);
 Route::post('/simpan-kategori', [KategoriController::class, 'simpan']);
-Route::get('/update-kategori/{kategori}', [KategoriController::class, 'update']);
+Route::get('/ubah-kategori/{kategori}', [KategoriController::class, 'ubah']);
+Route::put('/update-kategori/{kategori}', [KategoriController::class, 'update']);
+Route::delete('/hapus-kategori/{kategori}', [KategoriController::class, 'delete']);
 
 // ROUTE PERTANYAAN
 Route::get('/daftar-pertanyaan', [PertanyaanController::class, 'tampil']);
 Route::get('/tambah-pertanyaan', [PertanyaanController::class, 'create']);
-Route::post('/simpan-kategori', [PertanyaanController::class, "simpan"]);
+Route::post('/simpan-pertanyaan', [PertanyaanController::class, "simpan"]);
