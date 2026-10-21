@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->longText('pertanyaan');
             $table->longText('jawaban');
+            $table->enum('status', ['draft', 'pending', 'published', 'rejected'])
+            ->default('draft');
             $table->timestamps();
         });
     }
