@@ -55,10 +55,8 @@ class KategoriController extends Controller
     }
 
     
-    public function update(Request $request)
+    public function update(Request $request, Kategori $kategori)
     {
-        $kategori = Kategori::findOrFail($request->id);
-
         $request->validate([
             'nama' => 'required|string|max:100|unique:kategoris,nama,' . $kategori->id,
             'deskripsi' => 'nullable|string|max:1000'
@@ -80,9 +78,8 @@ class KategoriController extends Controller
     }
 
     // Menghapus kategori
-    public function delete($kategori)
+    public function delete(Kategori $kategori)
     {
-        $kategori = Kategori::findOrFail($kategori);
         $kategori->delete();
 
         return redirect('/daftar-kategori')

@@ -13,6 +13,12 @@
             </p>
         @endif
 
+        @if (session('error'))
+            <p style="color: red;">
+                {{ session('error') }}
+            </p>
+        @endif
+
         <a href="/tambah-pertanyaan">
             Tambah Pertanyaan
         </a>
@@ -40,14 +46,36 @@
                     <a href="/ubah-pertanyaan/{{ $pertanyaan->id }}">
                         Edit
                     </a>
+                    
+                    
+                    @if ($pertanyaan->status !== 'pending')
+                        <form action="/hapus-pertanyaan/{{ $pertanyaan->id }}"
+                            method="POST"
+                            style="display: inline;">
+                            @csrf
+                            @method('DELETE')
 
-                    <form action="/hapus-pertanyaan/{{ $pertanyaan->id }}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus pertanyaan ini?')">
-                            Hapus
-                        </button>
-                    </form>
+                            <button type="submit"
+                                onclick="return confirm('Yakin ingin menghapus pertanyaan ini?')">
+                                Hapus
+                            </button>
+                        </form>
+                    @endif
+
+
+                    @if ($pertanyaan->status === 'draft')
+                        <form action="/kirim-pertanyaan/{{ $pertanyaan->id }}"
+                            method="POST"
+                            style="display: inline;">
+                            @csrf
+
+                            <button type="submit"
+                                onclick="return confirm('Kirim pertanyaan ini ke validator?')">
+                                Kirim
+                            </button>
+                        </form>
+                    @endif
+
                 </td>
             </tr>
             @endforeach

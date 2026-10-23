@@ -20,6 +20,8 @@ Route::post('/simpan-pertanyaan', [PertanyaanController::class, "simpan"]);
 Route::get('/ubah-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'ubah']);
 Route::put('/update-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'update']);
 Route::delete('/hapus-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'delete']);
+Route::post('/kirim-pertanyaan/{pertanyaan}', [PertanyaanController::class,'kirim']);
+
 
 // ROUTE Halaman FAQ
 Route::get('/faq', [FAQController::class, 'index'])->name('faq.index');
