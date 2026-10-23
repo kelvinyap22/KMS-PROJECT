@@ -88,7 +88,7 @@
 
                 <form id="nrp-form" onsubmit="handleNrpSubmit(event)" class="space-y-4">
                     <div class="text-left">
-                        <label for="input-nrp" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Nomor RP (NRP)</label>
+                        <label for="input-nrp" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">NRP</label>
                         <div class="relative">
                             <i class="fa-solid fa-hashtag absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                             <input 
@@ -106,7 +106,7 @@
                         type="submit" 
                         class="w-full bg-ubaya-red hover:bg-ubaya-hover text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg shadow-red-600/30 transition duration-200 flex items-center justify-center gap-2"
                     >
-                        <span>Masuk ke Sistem FAQ</span>
+                        <span>Masuk</span>
                         <i class="fa-solid fa-arrow-right text-sm"></i>
                     </button>
                 </form>
@@ -229,7 +229,7 @@
                 </p>
                 <button onclick="openModal('suggest-modal')" class="mt-4 bg-ubaya-red text-white text-xs font-semibold px-5 py-2.5 rounded-xl hover:bg-ubaya-hover transition inline-flex items-center gap-2">
                     <i class="fa-solid fa-plus"></i>
-                    <span>Kirimkan Pertanyaan Ini ke Data Entry</span>
+                    <span>Kirimkan Pertanyaan Ini ke Sistem</span>
                 </button>
             </div>
 
