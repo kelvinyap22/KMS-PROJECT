@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'pending', 'published', 'rejected'])
             ->default('draft');
             $table->timestamps();
+            $table->foreignId('created_by')->nullable()->constrained('users');
         });
     }
 

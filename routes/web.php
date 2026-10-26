@@ -28,3 +28,6 @@ Route::get('/faq', [FAQController::class, 'index'])->name('faq.index');
 
 // Route untuk memproses form saran pertanyaan dari mahasiswa
 Route::post('/faq/suggest', [FAQController::class, 'storeSuggestion'])->name('faq.suggest');
+Route::get('/', [StudentFaqController::class, 'index'])->name('kms.index');
+Route::post('/verify-nrp', [StudentFaqController::class, 'verifyNrp'])->name('student.verify-nrp');
+Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'])->name('student.store-suggestion');

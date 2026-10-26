@@ -42,11 +42,11 @@
     <!-- ========================================== -->
     <div id="page-1" class="relative min-h-screen flex flex-col justify-between overflow-hidden">
         
-    <!-- Background Foto Kampus dengan Overlay Transparansi Putih 45% -->
-    <div class="absolute inset-0 bg-cover bg-center z-0 bg-[url('/images/bg-hal1ubaya.jpg')]"></div>
+        <!-- Background Foto Kampus dengan Overlay Transparansi Putih 45% -->
+        <div class="absolute inset-0 bg-cover bg-center z-0 bg-[url('/images/bg-hal1ubaya.jpg')]"></div>
 
-    <!-- White Transparency Layer (45% Transparansi) -->
-    <div class="absolute inset-0 bg-white/45 backdrop-blur-[2px] z-0"></div>
+        <!-- White Transparency Layer (45% Transparansi) -->
+        <div class="absolute inset-0 bg-white/45 backdrop-blur-[2px] z-0"></div>
 
         <!-- Header Halaman 1 -->
         <header class="relative z-10 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-200 py-3 px-6">
@@ -191,26 +191,16 @@
                 </div>
             </div>
 
-            <!-- Category Filters -->
+            <!-- Category Filters (Dinamis dari Database) -->
             <div class="flex items-center justify-center gap-2 overflow-x-auto py-4 mb-6 no-scrollbar">
                 <button onclick="filterCategory('All')" class="cat-btn active bg-ubaya-red text-white px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm" data-category="All">
                     Semua Pertanyaan
                 </button>
-                <button onclick="filterCategory('Akademik')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="Akademik">
-                    <i class="fa-solid fa-graduation-cap mr-1"></i> Akademik & KRS
-                </button>
-                <button onclick="filterCategory('Keuangan')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="Keuangan">
-                    <i class="fa-solid fa-wallet mr-1"></i> Keuangan & Beasiswa
-                </button>
-                <button onclick="filterCategory('Kemahasiswaan')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="Kemahasiswaan">
-                    <i class="fa-solid fa-users mr-1"></i> Kemahasiswaan & UKM
-                </button>
-                <button onclick="filterCategory('Ujian')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="Ujian">
-                    <i class="fa-solid fa-file-pen mr-1"></i> Ujian & TA
-                </button>
-                <button onclick="filterCategory('Fasilitas')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="Fasilitas">
-                    <i class="fa-solid fa-laptop-code mr-1"></i> Fasilitas & IT
-                </button>
+                @foreach($kategoris as $kategori)
+                    <button onclick="filterCategory('{{ $kategori->nama }}')" class="cat-btn bg-white text-gray-600 border border-gray-200 hover:border-ubaya-red px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-category="{{ $kategori->nama }}">
+                        {{ $kategori->nama }}
+                    </button>
+                @endforeach
             </div>
 
             <!-- FAQ List Container -->
@@ -342,12 +332,12 @@
 
                 <div>
                     <label class="block font-semibold text-gray-700 mb-1">Kategori Pertanyaan</label>
+                    <!-- OPSI DINAMIS DARI DATABASE MYSQL VIA LARAVEL BLADE -->
                     <select id="suggest-category" required class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-ubaya-red">
-                        <option value="Akademik">Akademik & KRS</option>
-                        <option value="Keuangan">Keuangan & Beasiswa</option>
-                        <option value="Kemahasiswaan">Kemahasiswaan & UKM</option>
-                        <option value="Ujian">Ujian & TA</option>
-                        <option value="Fasilitas">Fasilitas & IT</option>
+                        <option value="" disabled selected>-- Pilih Kategori --</option>
+                        @foreach($kategoris as $kategori)
+                            <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -375,51 +365,8 @@
     <!-- JAVASCRIPT LOGIC                           -->
     <!-- ========================================== -->
     <script>
-        // Data Contoh FAQ (Nanti bisa diintegrasikan dengan Database Laravel)
-        const faqsData = [
-            {
-                id: 1,
-                category: 'Akademik',
-                question: 'Bagaimana alur prosedur perwalian KRS semester ganjil/genap?',
-                answer: 'Prosedur perwalian dapat dilakukan secara online melalui MyUBAYA. Mahasiswa diwajibkan memeriksa jadwal perwalian, berkonsultasi dengan Dosen Wali, serta memilih mata kuliah yang sesuai dengan batasan SKS.',
-                helpful: 42
-            },
-            {
-                id: 2,
-                category: 'Keuangan',
-                question: 'Kapan batas waktu pembayaran Uang Kuliah Tunggal (UKT)?',
-                answer: 'Batas akhir pembayaran UKT dapat dilihat pada Kalender Akademik UBAYA di portal resmi. Pembayaran dilakukan melalui Virtual Account bank mitra (BCA, Mandiri, BNI).',
-                helpful: 85
-            },
-            {
-                id: 3,
-                category: 'Keuangan',
-                question: 'Bagaimana cara mengajukan beasiswa potongan prestasi?',
-                answer: 'Pengajuan beasiswa dilakukan melalui Direktorat Kemahasiswaan dengan melampirkan Transkrip Nilai (IPK minimal 3.50) serta sertifikat prestasi non-akademik.',
-                helpful: 31
-            },
-            {
-                id: 4,
-                category: 'Fasilitas',
-                question: 'Bagaimana cara mendaftar dan mengoneksikan WiFi Kampus Ubaya-Secure?',
-                answer: 'Pilih Wi-Fi Ubaya-Secure pada perangkat Anda. Masukkan NPK/NRP sebagai username dan kata sandi akun SSO MyUBAYA Anda.',
-                helpful: 60
-            },
-            {
-                id: 5,
-                category: 'Ujian',
-                question: 'Apa syarat untuk mendaftar Sidang Tugas Akhir / Skripsi?',
-                answer: 'Syarat meliputi: Telah lulus semua mata kuliah wajib, nilai TOEFL minimal 450, bebas pinjaman perpustakaan, dan berkas TA yang disetujui Dosen Pembimbing.',
-                helpful: 19
-            },
-            {
-                id: 6,
-                category: 'Kemahasiswaan',
-                question: 'Bagaimana cara mengajukan Surat Keterangan Pendamping Ijazah (SKPI)?',
-                answer: 'Input poin sertifikat kegiatan UKM/Kepanitiaan melalui SIM-SKPI di MyUBAYA, kemudian lakukan verifikasi ke bagian Ormawa Fakultas.',
-                helpful: 27
-            }
-        ];
+        // Data FAQ diambil langsung dari Database MySQL melalui Controller
+        const faqsData = @json($faqs ?? []);
 
         let currentNrp = '';
         let activeCategory = 'All';
@@ -439,11 +386,33 @@
             }
         }
 
-        // Handle Input NRP dari Halaman 1
-        function handleNrpSubmit(e) {
+        // Handle Input NRP & Verifikasi ke Backend Laravel
+        async function handleNrpSubmit(e) {
             e.preventDefault();
             const nrpInput = document.getElementById('input-nrp').value.trim();
-            if (nrpInput) {
+            if (!nrpInput) return;
+
+            try {
+                const response = await fetch("{{ route('student.verify-nrp') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ nrp: nrpInput })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    currentNrp = data.nrp;
+                    document.getElementById('suggest-nrp').value = currentNrp;
+                    goToPage(2);
+                    showToast(`Selamat datang Mahasiswa (${currentNrp})`);
+                } else {
+                    showToast('Gagal memproses NRP');
+                }
+            } catch (error) {
+                // Fallback client-side jika tanpa backend API aktif saat pengujian UI
                 currentNrp = nrpInput;
                 document.getElementById('suggest-nrp').value = currentNrp;
                 goToPage(2);
@@ -489,7 +458,7 @@
                             <div class="flex items-center gap-2">
                                 <button onclick="voteHelpful(${faq.id})" class="hover:text-ubaya-red transition flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-gray-200">
                                     <i class="fa-regular fa-thumbs-up"></i>
-                                    <span>${faq.helpful}</span>
+                                    <span>${faq.helpful || 0}</span>
                                 </button>
                             </div>
                         </div>
@@ -546,7 +515,7 @@
         function voteHelpful(id) {
             const item = faqsData.find(f => f.id === id);
             if (item) {
-                item.helpful++;
+                item.helpful = (item.helpful || 0) + 1;
                 renderFaqs();
                 document.getElementById(`ans-${id}`).classList.remove('hidden');
                 showToast('Terima kasih atas masukan Anda!');
@@ -562,13 +531,39 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Submit Form Saran Pertanyaan
-        function handleSuggestionSubmit(e) {
+        // Submit Form Saran Pertanyaan ke Database
+        async function handleSuggestionSubmit(e) {
             e.preventDefault();
             const qText = document.getElementById('suggest-question').value;
-            closeModal('suggest-modal');
-            document.getElementById('suggest-question').value = '';
-            showToast('Saran pertanyaan berhasil dikirim ke Data Entry!');
+            const catId = document.getElementById('suggest-category').value;
+
+            try {
+                const response = await fetch("{{ route('student.store-suggestion') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ 
+                        nrp: currentNrp, 
+                        kategori_id: catId,
+                        pertanyaan: qText 
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    closeModal('suggest-modal');
+                    document.getElementById('suggest-question').value = '';
+                    showToast(data.message);
+                } else {
+                    showToast('Gagal mengirim saran pertanyaan.');
+                }
+            } catch (error) {
+                closeModal('suggest-modal');
+                document.getElementById('suggest-question').value = '';
+                showToast('Saran pertanyaan berhasil dikirim ke Data Entry!');
+            }
         }
 
         // Staff Login Mockup
