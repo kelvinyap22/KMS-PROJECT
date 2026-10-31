@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             KategoriSeeder::class,
             PertanyaanSeeder::class,
             RoleSeeder::class,
+            MahasiswaSeeder::class,
         ]);
     }
 }

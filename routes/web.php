@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PertanyaanController;
-use App\Http\Controllers\FAQController;
+use App\Http\Controllers\MahasiswaAuthController;
+use App\Http\Controllers\StudentFaqController;
 
 // ROUTE KATEGORI
 Route::get('/daftar-kategori', [KategoriController::class, 'tampil']);
@@ -22,12 +23,23 @@ Route::put('/update-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'upd
 Route::delete('/hapus-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'delete']);
 Route::post('/kirim-pertanyaan/{pertanyaan}', [PertanyaanController::class,'kirim']);
 
+// ==============================
+// LOGIN MAHASISWA
+// ==============================
 
-// ROUTE Halaman FAQ
-Route::get('/faq', [FAQController::class, 'index'])->name('faq.index');
+Route::get('/login-mahasiswa', [MahasiswaAuthController::class, 'showLogin'])
+    ->name('mahasiswa.login.form');
 
-// Route untuk memproses form saran pertanyaan dari mahasiswa
-Route::post('/faq/suggest', [FAQController::class, 'storeSuggestion'])->name('faq.suggest');
-Route::get('/', [StudentFaqController::class, 'index'])->name('kms.index');
-Route::post('/verify-nrp', [StudentFaqController::class, 'verifyNrp'])->name('student.verify-nrp');
-Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'])->name('student.store-suggestion');
+Route::post('/login-mahasiswa', [MahasiswaAuthController::class, 'login'])
+    ->name('student.verify-nrp');
+
+// halaman utama FAQ mahasiswa dan saran pertanyaan mahasiswa
+Route::middleware(['mahasiswa'])->group(function () {
+Route::get('/kms', [StudentFaqController::class, 'index'])
+        ->name('student.kms');
+Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'])
+        ->name('student.store-suggestion');
+Route::post('/logout-mahasiswa', [MahasiswaAuthController::class, 'logout'])
+        ->name('mahasiswa.logout');
+
+});
