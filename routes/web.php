@@ -5,6 +5,7 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\MahasiswaAuthController;
 use App\Http\Controllers\StudentFaqController;
+use App\Http\Controllers\ValidatorController;
 
 // ROUTE KATEGORI
 Route::get('/daftar-kategori', [KategoriController::class, 'tampil']);
@@ -41,5 +42,6 @@ Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'
         ->name('student.store-suggestion');
 Route::post('/logout-mahasiswa', [MahasiswaAuthController::class, 'logout'])
         ->name('mahasiswa.logout');
+
 
 });
