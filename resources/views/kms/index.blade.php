@@ -837,5 +837,44 @@ function toggleAccordion(id) {
 
     </script>
 
+    <!-- Form Logout Otomatis (Hidden) -->
+    <form id="auto-logout-form" action="{{ route('mahasiswa.logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
+
+    <script>
+        (function () {
+            // Batas waktu inaktivitas: 3 menit (3 * 60 * 1000 ms)
+            const TIMEOUT_LIMIT = 3 * 60 * 1000;
+            let inactivityTimer;
+
+            // Fungsi untuk mereset ulang hitung mundur
+            function resetTimer() {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(triggerLogout, TIMEOUT_LIMIT);
+            }
+
+            // Fungsi untuk mengeksekusi logout
+            function triggerLogout() {
+                const logoutForm = document.getElementById('auto-logout-form');
+                if (logoutForm) {
+                    logoutForm.submit();
+                } else {
+                    window.location.href = "{{ url('/login-mahasiswa') }}";
+                }
+            }
+
+            // Event listener aktivitas pengguna
+            const userActivityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+
+            userActivityEvents.forEach(function (eventName) {
+                window.addEventListener(eventName, resetTimer, true);
+            });
+
+            // Jalankan timer pertama kali saat halaman dibuka
+            resetTimer();
+        })();
+    </script>
+
 </body>
 </html>
