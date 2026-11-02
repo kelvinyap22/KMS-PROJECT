@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -5,8 +6,15 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\MahasiswaAuthController;
 use App\Http\Controllers\StudentFaqController;
+use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\DataEntryController;
+use App\Http\Controllers\ValidatorController;
 
+
+// =================================
 // ROUTE KATEGORI
+// =================================
+
 Route::get('/daftar-kategori', [KategoriController::class, 'tampil']);
 Route::get('/tambah-kategori', [KategoriController::class, 'create']);
 Route::post('/simpan-kategori', [KategoriController::class, 'simpan']);
@@ -14,18 +22,23 @@ Route::get('/ubah-kategori/{kategori}', [KategoriController::class, 'ubah']);
 Route::put('/update-kategori/{kategori}', [KategoriController::class, 'update']);
 Route::delete('/hapus-kategori/{kategori}', [KategoriController::class, 'delete']);
 
+
+// =================================
 // ROUTE PERTANYAAN
+// =================================
+
 Route::get('/daftar-pertanyaan', [PertanyaanController::class, 'tampil']);
 Route::get('/tambah-pertanyaan', [PertanyaanController::class, 'create']);
-Route::post('/simpan-pertanyaan', [PertanyaanController::class, "simpan"]);
+Route::post('/simpan-pertanyaan', [PertanyaanController::class, 'simpan']);
 Route::get('/ubah-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'ubah']);
 Route::put('/update-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'update']);
 Route::delete('/hapus-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'delete']);
-Route::post('/kirim-pertanyaan/{pertanyaan}', [PertanyaanController::class,'kirim']);
+Route::post('/kirim-pertanyaan/{pertanyaan}', [PertanyaanController::class, 'kirim']);
 
-// ==============================
+
+// =================================
 // LOGIN MAHASISWA
-// ==============================
+// =================================
 
 Route::get('/login-mahasiswa', [MahasiswaAuthController::class, 'showLogin'])
     ->name('mahasiswa.login.form');
@@ -33,25 +46,39 @@ Route::get('/login-mahasiswa', [MahasiswaAuthController::class, 'showLogin'])
 Route::post('/login-mahasiswa', [MahasiswaAuthController::class, 'login'])
     ->name('student.verify-nrp');
 
-// halaman utama FAQ mahasiswa dan saran pertanyaan mahasiswa
+
+// =================================
+// HALAMAN MAHASISWA
+// =================================
+
 Route::middleware(['mahasiswa'])->group(function () {
-Route::get('/kms', [StudentFaqController::class, 'index'])
+
+    Route::get('/kms', [StudentFaqController::class, 'index'])
         ->name('student.kms');
-Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'])
+
+    Route::post('/saran-pertanyaan', [StudentFaqController::class, 'storeSuggestion'])
         ->name('student.store-suggestion');
-Route::post('/logout-mahasiswa', [MahasiswaAuthController::class, 'logout'])
+
+    Route::post('/logout-mahasiswa', [MahasiswaAuthController::class, 'logout'])
         ->name('mahasiswa.logout');
 
-
 });
-// ==============================
-// LOGIN USERS
-// ==============================
+
+
+// =================================
+// LOGIN STAFF / USERS
+// =================================
+
 Route::post('/staff/login', [UserAuthController::class, 'login'])
     ->name('staff.login');
 
 Route::post('/staff/logout', [UserAuthController::class, 'logout'])
     ->name('staff.logout');
+
+
+// =================================
+// DASHBOARD DATA ENTRY
+// =================================
 
 Route::prefix('dataentry')
     ->name('dataentry.')
@@ -72,4 +99,29 @@ Route::prefix('dataentry')
 
         Route::post('/kirim-pertanyaan/{id}', [DataEntryController::class, 'kirim'])
             ->name('kirim');
+
+    });
+
+
+// =================================
+// DASHBOARD VALIDATOR
+// =================================
+
+Route::prefix('validator')
+    ->name('validator.')
+    ->middleware('auth')
+    ->group(function () {
+
+        // Daftar pertanyaan yang menunggu validasi
+        Route::get('/dashboard', [ValidatorController::class, 'index'])
+            ->name('dashboard');
+
+        // Menyetujui pertanyaan
+        Route::post('/pertanyaan/{pertanyaan}/approve', [ValidatorController::class, 'approve'])
+            ->name('approve');
+
+        // Menolak pertanyaan
+        Route::post('/pertanyaan/{pertanyaan}/reject', [ValidatorController::class, 'reject'])
+            ->name('reject');
+
     });

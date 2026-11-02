@@ -9,14 +9,14 @@ class ValidatorController extends Controller
 {
     // Memastikan hanya role Validator yang bisa mengakses
     private function checkValidator()
-    {
-        abort_unless(
-            auth()->check() &&
-            auth()->user()->role?->nama === 'Validator',
-            403,
-            'Anda tidak memiliki akses ke halaman Validator.'
-        );
-    }
+{
+    abort_unless(
+        auth()->check() &&
+        auth()->user()->role_id == 2,
+        403,
+        'Anda tidak memiliki akses ke halaman Validator.'
+    );
+}
 
     // Menampilkan daftar pertanyaan yang menunggu validasi
     public function index()
@@ -28,7 +28,7 @@ class ValidatorController extends Controller
             ->latest()
             ->get();
 
-        return view('staff.validator.index', compact('pertanyaans'));
+        return view('validator.index', compact('pertanyaans'));
     }
 
     // Menyetujui pertanyaan dan jawaban
