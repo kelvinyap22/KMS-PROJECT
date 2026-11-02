@@ -8,13 +8,19 @@ use App\Models\User;
 
 class Pertanyaan extends Model
 {
-    protected $table = 'pertanyaans';
     protected $fillable = [
-        'kategori_id', 'pertanyaan', 'jawaban', 'status', 
-        'created_by', 'reviewed_by', 'reviewed_at', 'catatan_review'
+        'kategori_id',
+        'pertanyaan',
+        'jawaban',
+        'status',
+        'created_by',
+        'reviewed_by',
+        'reviewed_at',
+        'catatan_review',
     ];
 
-    public function kategori() {
+    public function kategori()
+    {
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
     public function creator()

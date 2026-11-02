@@ -5,7 +5,6 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PertanyaanController;
 use App\Http\Controllers\MahasiswaAuthController;
 use App\Http\Controllers\StudentFaqController;
-use App\Http\Controllers\ValidatorController;
 
 // ROUTE KATEGORI
 Route::get('/daftar-kategori', [KategoriController::class, 'tampil']);
@@ -45,3 +44,32 @@ Route::post('/logout-mahasiswa', [MahasiswaAuthController::class, 'logout'])
 
 
 });
+// ==============================
+// LOGIN USERS
+// ==============================
+Route::post('/staff/login', [UserAuthController::class, 'login'])
+    ->name('staff.login');
+
+Route::post('/staff/logout', [UserAuthController::class, 'logout'])
+    ->name('staff.logout');
+
+Route::prefix('dataentry')
+    ->name('dataentry.')
+    ->middleware('auth')
+    ->group(function () {
+
+        Route::get('/index', [DataEntryController::class, 'index'])
+            ->name('index');
+
+        Route::post('/simpan-pertanyaan', [DataEntryController::class, 'store'])
+            ->name('store');
+
+        Route::put('/update-pertanyaan/{id}', [DataEntryController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/hapus-pertanyaan/{id}', [DataEntryController::class, 'destroy'])
+            ->name('destroy');
+
+        Route::post('/kirim-pertanyaan/{id}', [DataEntryController::class, 'kirim'])
+            ->name('kirim');
+    });

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -201,86 +200,86 @@
 
         </div>
     </div>
+<!-- ================================= -->
+<!-- MODAL LOGIN STAFF                -->
+<!-- ================================= -->
 
+<div id="login-modal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 
-    <!-- ================================= -->
-    <!-- MODAL LOGIN STAFF                 -->
-    <!-- ================================= -->
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative">
 
-    <div id="login-modal"
-         class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <button onclick="closeModal('login-modal')"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
 
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative">
+        <div class="text-center mb-5">
 
-            <button onclick="closeModal('login-modal')"
-                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <div class="text-center mb-5">
-
-                <div class="w-12 h-12 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <i class="fa-solid fa-user-lock text-xl"></i>
-                </div>
-
-                <h3 class="font-bold text-gray-900 text-lg">
-                    Login Portal Staff
-                </h3>
-
-                <p class="text-xs text-gray-500">
-                    Khusus untuk Data Entry, Validator & Super Admin
-                </p>
-
+            <div class="w-12 h-12 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="fa-solid fa-user-lock text-xl"></i>
             </div>
 
-            <form onsubmit="handleStaffLogin(event)" class="space-y-4 text-xs">
+            <h3 class="font-bold text-gray-900 text-lg">
+                Login Portal Staff
+            </h3>
 
-                <div>
-                    <label class="block font-semibold text-gray-700 mb-1">
-                        Peran Staff (Role)
-                    </label>
-
-                    <select id="staff-role"
-                        class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-ubaya-red font-medium">
-
-                        <option value="data_entry">Data Entry</option>
-                        <option value="validator">Validator</option>
-                        <option value="super_admin">Super Admin</option>
-
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-gray-700 mb-1">
-                        Username / NPK
-                    </label>
-
-                    <input type="text" id="staff-username" required
-                        placeholder="Masukkan NPK Staff"
-                        class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-ubaya-red">
-                </div>
-
-                <div>
-                    <label class="block font-semibold text-gray-700 mb-1">
-                        Kata Sandi
-                    </label>
-
-                    <input type="password" id="staff-password" required
-                        placeholder="••••••••"
-                        class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-ubaya-red">
-                </div>
-
-                <button type="submit"
-                    class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition mt-2 text-xs">
-                    Masuk ke Dashboard Staff
-                </button>
-
-            </form>
+            <p class="text-xs text-gray-500">
+                Khusus untuk Data Entry, Validator & Super Admin
+            </p>
 
         </div>
+        
+<form action="{{ route('staff.login') }}" method="POST"
+    class="space-y-4 text-xs">
+
+    @csrf
+
+    <!-- EMAIL -->
+    <div>
+        <label class="block font-semibold text-gray-700 mb-1">
+            Email Staff
+        </label>
+
+        <input type="email" name="email" required
+            placeholder="Masukkan email staff"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-ubaya-red">
     </div>
 
+    <!-- PASSWORD -->
+    <div>
+        <label class="block font-semibold text-gray-700 mb-1">
+            Kata Sandi
+        </label>
 
+        <input type="password" name="password" required
+            placeholder="Masukkan kata sandi"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-ubaya-red">
+    </div>
+
+    <!-- ERROR LOGIN -->
+    @if(session('error'))
+        <p class="text-red-600 text-xs">
+            {{ session('error') }}
+        </p>
+    @endif
+
+    @if($errors->any())
+        <p class="text-red-600 text-xs">
+            {{ $errors->first() }}
+        </p>
+    @endif
+
+    <!-- BUTTON -->
+    <button type="submit"
+        class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition mt-2 text-xs">
+        Masuk ke Dashboard Staff
+    </button>
+
+</form>
+
+    </div>
+</div>
     <!-- ================================= -->
     <!-- TOAST NOTIFICATION                -->
     <!-- ================================= -->
@@ -379,17 +378,6 @@
 
 
         // =================================
-        // LOGIN STAFF
-        // =================================
-
-        function handleStaffLogin(e) {
-
-            e.preventDefault();
-
-            // Belum terhubung ke autentikasi Laravel.
-            showToast('Login Staff belum dihubungkan ke backend.');
-
-        }
 
 
         // =================================
