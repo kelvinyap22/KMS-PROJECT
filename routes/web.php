@@ -9,6 +9,7 @@ use App\Http\Controllers\StudentFaqController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\DataEntryController;
 use App\Http\Controllers\ValidatorController;
+use App\Http\Controllers\SuperAdminController;
 
 
 // =================================
@@ -124,4 +125,33 @@ Route::prefix('validator')
         Route::post('/pertanyaan/{pertanyaan}/reject', [ValidatorController::class, 'reject'])
             ->name('reject');
 
+    });
+
+// =================================
+// DASHBOARD SUPER ADMIN
+// =================================
+Route::prefix('superadmin')
+    ->name('superadmin.')
+    ->middleware('auth')
+    ->group(function () {
+
+        // Dashboard View
+        Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('dashboard');
+
+        // CRUD Users
+        Route::post('/users', [SuperAdminController::class, 'storeUser'])->name('users.store');
+        Route::put('/users/{id}', [SuperAdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{id}', [SuperAdminController::class, 'destroyUser'])->name('users.destroy');
+
+        // CRUD Kategori
+        Route::post('/kategori', [SuperAdminController::class, 'storeKategori'])->name('kategori.store');
+        Route::put('/kategori/{id}', [SuperAdminController::class, 'updateKategori'])->name('kategori.update');
+        Route::delete('/kategori/{id}', [SuperAdminController::class, 'destroyKategori'])->name('kategori.destroy');
+
+        // CRUD Pertanyaan FAQ
+        Route::put('/pertanyaan/{id}', [SuperAdminController::class, 'updatePertanyaan'])->name('pertanyaan.update');
+        Route::delete('/pertanyaan/{id}', [SuperAdminController::class, 'destroyPertanyaan'])->name('pertanyaan.destroy');
+
+        // Update Saran Mahasiswa
+        Route::put('/saran/{id}', [SuperAdminController::class, 'updateSaran'])->name('saran.update');
     });
