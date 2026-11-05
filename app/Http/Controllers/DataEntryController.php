@@ -65,22 +65,29 @@ class DataEntryController extends Controller
         'saran_id' => 'nullable|exists:saran_pertanyaans,id',
     ]);
 
-    Pertanyaan::create([
-        'kategori_id' => $request->kategori_id,
-        'pertanyaan' => $request->pertanyaan,
-        'jawaban' => $request->jawaban,
-        'status' => 'draft',
-        'created_by' => auth()->id(),
-    ]);
+    \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
 
-    // Jika FAQ dibuat berdasarkan saran mahasiswa
-    if ($request->filled('saran_id')) {
-        SaranPertanyaan::where('id', $request->saran_id)
-            ->update([
-                'status' => 'diproses',
-                'ditangani_oleh' => auth()->id(),
-            ]);
-    }
+        // Simpan FAQ ke tabel pertanyaans
+        Pertanyaan::create([
+            'kategori_id' => $request->kategori_id,
+            'pertanyaan' => $request->pertanyaan,
+            'jawaban' => $request->jawaban,
+            'status' => 'draft',
+            'created_by' => auth()->id(),
+        ]);
+
+        // Jika FAQ berasal dari saran mahasiswa
+        if ($request->filled('saran_id')) {
+
+            SaranPertanyaan::where('id', $request->saran_id)
+                ->update([
+                    'status' => 'selesai',
+                    'ditangani_oleh' => auth()->id(),
+                ]);
+
+        }
+
+    });
 
     return redirect()->route('dataentry.index')
         ->with('success', 'Pertanyaan berhasil ditambahkan.');

@@ -157,135 +157,6 @@
         </div>
 
         <!-- SARAN PERTANYAAN MAHASISWA -->
-<div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
-
-    <div class="p-5 border-b flex justify-between items-center">
-        <div>
-            <h3 class="font-bold text-lg">
-                <i class="fa-solid fa-lightbulb mr-2 text-yellow-500"></i>
-                Saran Pertanyaan Mahasiswa
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">
-                Daftar pertanyaan yang disarankan oleh mahasiswa.
-            </p>
-        </div>
-
-        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-            {{ $saranPertanyaans->where('status', 'baru')->count() }} Saran Baru
-        </span>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-
-            <thead class="bg-gray-50 text-gray-600">
-                <tr>
-                    <th class="px-5 py-4 text-left">No</th>
-                    <th class="px-5 py-4 text-left">Pertanyaan Mahasiswa</th>
-                    <th class="px-5 py-4 text-left">Tanggal</th>
-                    <th class="px-5 py-4 text-center">Status</th>
-                    <th class="px-5 py-4 text-center">Aksi</th>
-                </tr>
-            </thead>
-
-            <tbody class="divide-y">
-
-                @forelse($saranPertanyaans as $index => $saran)
-                    <tr class="hover:bg-gray-50">
-
-                        <td class="px-5 py-4">
-                            {{ $index + 1 }}
-                        </td>
-
-                        <td class="px-5 py-4 max-w-md">
-                            <p class="font-medium">
-                                {{ $saran->pertanyaan }}
-                            </p>
-                        </td>
-
-                        <td class="px-5 py-4">
-                            {{ $saran->created_at?->format('d/m/Y H:i') ?? '-' }}
-                        </td>
-
-                        <td class="px-5 py-4 text-center">
-                            @php
-                                $saranStatusClass = match($saran->status) {
-                                    'baru' => 'bg-yellow-100 text-yellow-700',
-                                    'diproses' => 'bg-blue-100 text-blue-700',
-                                    'selesai' => 'bg-green-100 text-green-700',
-                                    'ditolak' => 'bg-red-100 text-red-700',
-                                    default => 'bg-gray-100 text-gray-600'
-                                };
-                            @endphp
-
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $saranStatusClass }}">
-                                {{ ucfirst($saran->status) }}
-                            </span>
-                        </td>
-
-                        <td class="px-5 py-4">
-                            <div class="flex justify-center gap-2">
-
-                                @if($saran->status == 'baru')
-                                    <button
-                                        type="button"
-                                        onclick="gunakanSaran({{ json_encode($saran->pertanyaan) }}, {{ $saran->id }})"
-                                        class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-2 rounded"
-                                        title="Buat FAQ dari saran">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-
-                                    <form action="{{ route('dataentry.saran.status', $saran->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tolak saran pertanyaan ini?')">
-                                        @csrf
-                                        @method('PUT')
-
-                                        <input type="hidden" name="status" value="ditolak">
-
-                                        <button type="submit"
-                                            class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded"
-                                            title="Tolak saran">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </form>
-                                @elseif($saran->status == 'diproses')
-                                    <form action="{{ route('dataentry.saran.status', $saran->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Tandai saran ini sudah selesai ditindaklanjuti?')">
-                                        @csrf
-                                        @method('PUT')
-
-                                        <input type="hidden" name="status" value="selesai">
-
-                                        <button type="submit"
-                                            class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-2 rounded"
-                                            title="Tandai selesai">
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="text-gray-400 text-xs">Tidak ada aksi</span>
-                                @endif
-
-                            </div>
-                        </td>
-
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="text-center py-10 text-gray-400">
-                            <i class="fa-solid fa-inbox text-4xl mb-3"></i>
-                            <p>Belum ada saran pertanyaan dari mahasiswa.</p>
-                        </td>
-                    </tr>
-                @endforelse
-
-            </tbody>
-        </table>
-    </div>
-</div>
-
         <!-- FILTER -->
         <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
 
@@ -359,161 +230,395 @@
 
         </div>
 
-        <!-- TABLE -->
+
+        <!-- TAB DAN KONTEN TABEL -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
 
-            <div class="p-5 border-b flex justify-between items-center">
-                <h3 class="font-bold text-lg">
-                    <i class="fa-solid fa-list mr-2 text-blue-600"></i>
-                    Daftar Pertanyaan
-                </h3>
+            <!-- TOMBOL TAB -->
+            <div class="border-b">
+                <div class="flex items-center gap-6 px-5 pt-4">
 
-                <span class="text-sm text-gray-500">
-                    {{ $pertanyaans->total() }} data
-                </span>
+                    <button type="button"
+                        id="tabPertanyaan"
+                        onclick="gantiTab('pertanyaan')"
+                        class="border-b-2 border-blue-600 text-blue-600 pb-4 font-semibold">
+
+                        <i class="fa-solid fa-list mr-2"></i>
+                        Daftar Pertanyaan
+
+                    </button>
+
+                    <button type="button"
+                        id="tabSaran"
+                        onclick="gantiTab('saran')"
+                        class="border-b-2 border-transparent text-gray-500 pb-4 font-semibold">
+
+                        <i class="fa-solid fa-lightbulb mr-2"></i>
+                        Saran Mahasiswa
+
+                        <span class="ml-1 bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
+                            {{ $saranPertanyaans->where('status', 'baru')->count() }}
+                        </span>
+
+                    </button>
+
+                </div>
             </div>
 
-            <div class="overflow-x-auto">
 
-                <table class="w-full text-sm">
+            <!-- ===================================== -->
+            <!-- KONTEN TAB 1: DAFTAR PERTANYAAN -->
+            <!-- ===================================== -->
 
-                    <thead class="bg-gray-50 text-gray-600">
-                        <tr>
-                            <th class="px-5 py-4 text-left">No</th>
-                            <th class="px-5 py-4 text-left">Kategori</th>
-                            <th class="px-5 py-4 text-left">Pertanyaan</th>
-                            <th class="px-5 py-4 text-center">Status</th>
-                            <th class="px-5 py-4 text-center">Aksi</th>
-                        </tr>
-                    </thead>
+            <div id="kontenPertanyaan">
 
-                    <tbody class="divide-y">
+                <div class="p-5 border-b flex justify-between items-center">
 
-                        @forelse($pertanyaans as $index => $item)
+                    <h3 class="font-bold text-lg">
+                        <i class="fa-solid fa-list mr-2 text-blue-600"></i>
+                        Daftar Pertanyaan
+                    </h3>
 
-                            <tr class="hover:bg-gray-50">
+                    <span class="text-sm text-gray-500">
+                        {{ $pertanyaans->total() }} data
+                    </span>
 
-                                <td class="px-5 py-4">
-                                    {{ $pertanyaans->firstItem() + $index }}
-                                </td>
+                </div>
 
-                                <td class="px-5 py-4">
-                                    {{ $item->kategori->nama ?? '-' }}
-                                </td>
+                <div class="overflow-x-auto">
 
-                                <td class="px-5 py-4 max-w-md">
-                                    <p class="font-medium">
-                                        {{ $item->pertanyaan }}
-                                    </p>
+                    <table class="w-full text-sm">
 
-                                    <p class="text-gray-400 text-xs mt-1">
-                                        ID: {{ $item->id }}
-                                    </p>
-                                </td>
-
-                                <td class="px-5 py-4 text-center">
-
-                                    @php
-                                        $statusClass = match($item->status) {
-                                            'draft' => 'bg-gray-100 text-gray-600',
-                                            'pending' => 'bg-yellow-100 text-yellow-700',
-                                            'approved' => 'bg-green-100 text-green-700',
-                                            'rejected' => 'bg-red-100 text-red-700',
-                                            default => 'bg-gray-100 text-gray-600'
-                                        };
-                                    @endphp
-
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">
-                                        {{ ucfirst($item->status) }}
-                                    </span>
-
-                                </td>
-
-                                <td class="px-5 py-4">
-
-                                    <div class="flex justify-center items-center gap-2">
-
-                                        <!-- DETAIL -->
-                                        <button
-                                            onclick="lihatPertanyaan({{ json_encode($item) }})"
-                                            class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-2 rounded"
-                                            title="Detail">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-
-                                        <!-- EDIT -->
-                                        @if(in_array($item->status, ['draft', 'rejected']))
-                                            <button
-                                                onclick="editPertanyaan({{ json_encode($item) }})"
-                                                class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200 px-3 py-2 rounded"
-                                                title="Edit">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-                                        @endif
-
-                                        <!-- KIRIM -->
-                                        @if(in_array($item->status, ['draft', 'rejected']))
-                                            <form action="{{ route('dataentry.kirim', $item->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Kirim pertanyaan ke Validator?')">
-                                                @csrf
-
-                                                <button type="submit"
-                                                    class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-2 rounded"
-                                                    title="Kirim ke Validator">
-                                                    <i class="fa-solid fa-paper-plane"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                        <!-- HAPUS -->
-                                        @if($item->status != 'pending')
-                                            <form action="{{ route('dataentry.destroy', $item->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus pertanyaan ini?')">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit"
-                                                    class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
+                        <thead class="bg-gray-50 text-gray-600">
                             <tr>
-                                <td colspan="5" class="text-center py-12 text-gray-400">
-                                    <i class="fa-solid fa-folder-open text-4xl mb-3"></i>
-                                    <p>Belum ada pertanyaan.</p>
-                                </td>
+                                <th class="px-5 py-4 text-left">No</th>
+                                <th class="px-5 py-4 text-left">Kategori</th>
+                                <th class="px-5 py-4 text-left">Pertanyaan</th>
+                                <th class="px-5 py-4 text-center">Status</th>
+                                <th class="px-5 py-4 text-center">Aksi</th>
                             </tr>
+                        </thead>
 
-                        @endforelse
+                        <tbody class="divide-y">
 
-                    </tbody>
+                            @forelse($pertanyaans as $index => $item)
 
-                </table>
+                                <tr class="hover:bg-gray-50">
+
+                                    <td class="px-5 py-4">
+                                        {{ $pertanyaans->firstItem() + $index }}
+                                    </td>
+
+                                    <td class="px-5 py-4">
+                                        {{ $item->kategori->nama ?? '-' }}
+                                    </td>
+
+                                    <td class="px-5 py-4 max-w-md">
+                                        <p class="font-medium">
+                                            {{ $item->pertanyaan }}
+                                        </p>
+
+                                        <p class="text-gray-400 text-xs mt-1">
+                                            ID: {{ $item->id }}
+                                        </p>
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center">
+
+                                        @php
+                                            $statusClass = match($item->status) {
+                                                'draft' => 'bg-gray-100 text-gray-600',
+                                                'pending' => 'bg-yellow-100 text-yellow-700',
+                                                'approved' => 'bg-green-100 text-green-700',
+                                                'published' => 'bg-green-100 text-green-700',
+                                                'rejected' => 'bg-red-100 text-red-700',
+                                                default => 'bg-gray-100 text-gray-600'
+                                            };
+                                        @endphp
+
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">
+                                            {{ ucfirst($item->status) }}
+                                        </span>
+
+                                    </td>
+
+                                    <td class="px-5 py-4">
+
+                                        <div class="flex justify-center items-center gap-2">
+
+                                            <!-- DETAIL -->
+                                            <button
+                                                type="button"
+                                                onclick="lihatPertanyaan({{ json_encode($item) }})"
+                                                class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-2 rounded"
+                                                title="Detail">
+
+                                                <i class="fa-solid fa-eye"></i>
+
+                                            </button>
+
+                                            <!-- EDIT -->
+                                            @if(in_array($item->status, ['draft', 'rejected']))
+
+                                                <button
+                                                    type="button"
+                                                    onclick="editPertanyaan({{ json_encode($item) }})"
+                                                    class="bg-yellow-100 text-yellow-600 hover:bg-yellow-200 px-3 py-2 rounded"
+                                                    title="Edit">
+
+                                                    <i class="fa-solid fa-pen"></i>
+
+                                                </button>
+
+                                            @endif
+
+                                            <!-- KIRIM KE VALIDATOR -->
+                                            @if(in_array($item->status, ['draft', 'rejected']))
+
+                                                <form action="{{ route('dataentry.kirim', $item->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Kirim pertanyaan ke Validator?')">
+
+                                                    @csrf
+
+                                                    <button type="submit"
+                                                        class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-2 rounded"
+                                                        title="Kirim ke Validator">
+
+                                                        <i class="fa-solid fa-paper-plane"></i>
+
+                                                    </button>
+
+                                                </form>
+
+                                            @endif
+
+                                            <!-- HAPUS -->
+                                            @if($item->status != 'pending')
+
+                                                <form action="{{ route('dataentry.destroy', $item->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Yakin ingin menghapus pertanyaan ini?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit"
+                                                        class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded"
+                                                        title="Hapus">
+
+                                                        <i class="fa-solid fa-trash"></i>
+
+                                                    </button>
+
+                                                </form>
+
+                                            @endif
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="5" class="text-center py-12 text-gray-400">
+                                        <i class="fa-solid fa-folder-open text-4xl mb-3"></i>
+                                        <p>Belum ada pertanyaan.</p>
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="p-5 border-t">
+                    {{ $pertanyaans->links() }}
+                </div>
 
             </div>
 
-            <div class="p-5 border-t">
-                {{ $pertanyaans->links() }}
+
+            <!-- ===================================== -->
+            <!-- KONTEN TAB 2: SARAN MAHASISWA -->
+            <!-- ===================================== -->
+
+            <div id="kontenSaran" class="hidden">
+
+                <div class="p-5 border-b flex justify-between items-center">
+
+                    <div>
+                        <h3 class="font-bold text-lg">
+                            <i class="fa-solid fa-lightbulb mr-2 text-yellow-500"></i>
+                            Saran Pertanyaan Mahasiswa
+                        </h3>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Daftar pertanyaan yang disarankan oleh mahasiswa.
+                        </p>
+                    </div>
+
+                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
+                        {{ $saranPertanyaans->where('status', 'baru')->count() }} Saran Baru
+                    </span>
+
+                </div>
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full text-sm">
+
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr>
+                                <th class="px-5 py-4 text-left">No</th>
+                                <th class="px-5 py-4 text-left">Pertanyaan Mahasiswa</th>
+                                <th class="px-5 py-4 text-left">Tanggal</th>
+                                <th class="px-5 py-4 text-center">Status</th>
+                                <th class="px-5 py-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y">
+
+                            @forelse($saranPertanyaans as $index => $saran)
+
+                                <tr class="hover:bg-gray-50">
+
+                                    <td class="px-5 py-4">
+                                        {{ $index + 1 }}
+                                    </td>
+
+                                    <td class="px-5 py-4 max-w-md">
+                                        <p class="font-medium">
+                                            {{ $saran->pertanyaan }}
+                                        </p>
+                                    </td>
+
+                                    <td class="px-5 py-4">
+                                        {{ $saran->created_at?->format('d/m/Y H:i') ?? '-' }}
+                                    </td>
+
+                                    <td class="px-5 py-4 text-center">
+
+                                        @php
+                                            $saranStatusClass = match($saran->status) {
+                                                'baru' => 'bg-yellow-100 text-yellow-700',
+                                                'diproses' => 'bg-blue-100 text-blue-700',
+                                                'selesai' => 'bg-green-100 text-green-700',
+                                                'ditolak' => 'bg-red-100 text-red-700',
+                                                default => 'bg-gray-100 text-gray-600'
+                                            };
+                                        @endphp
+
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $saranStatusClass }}">
+                                            {{ ucfirst($saran->status) }}
+                                        </span>
+
+                                    </td>
+
+                                    <td class="px-5 py-4">
+
+                                        <div class="flex justify-center gap-2">
+
+                                            @if($saran->status == 'baru')
+
+                                                <!-- BUAT FAQ DARI SARAN -->
+                                                <button
+                                                    type="button"
+                                                    onclick="gunakanSaran({{ json_encode($saran->pertanyaan) }}, {{ $saran->id }})"
+                                                    class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-2 rounded"
+                                                    title="Buat FAQ dari saran">
+
+                                                    <i class="fa-solid fa-plus"></i>
+
+                                                </button>
+
+                                                <!-- TOLAK SARAN -->
+                                                <form action="{{ route('dataentry.saran.update-status', $saran->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Tolak saran pertanyaan ini?')">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <input type="hidden" name="status" value="ditolak">
+
+                                                    <button type="submit"
+                                                        class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded"
+                                                        title="Tolak saran">
+
+                                                        <i class="fa-solid fa-xmark"></i>
+
+                                                    </button>
+
+                                                </form>
+
+                                            @elseif($saran->status == 'diproses')
+
+                                                <!-- TANDAI SELESAI -->
+                                                <form action="{{ route('dataentry.saran.update-status', $saran->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Tandai saran ini sudah selesai ditindaklanjuti?')">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <input type="hidden" name="status" value="selesai">
+
+                                                    <button type="submit"
+                                                        class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-2 rounded"
+                                                        title="Tandai selesai">
+
+                                                        <i class="fa-solid fa-check"></i>
+
+                                                    </button>
+
+                                                </form>
+
+                                            @else
+
+                                                <span class="text-gray-400 text-xs">
+                                                    Tidak ada aksi
+                                                </span>
+
+                                            @endif
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="5" class="text-center py-12 text-gray-400">
+
+                                        <i class="fa-solid fa-inbox text-4xl mb-3"></i>
+
+                                        <p>Belum ada saran pertanyaan dari mahasiswa.</p>
+
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
             </div>
 
         </div>
-
-    </main>
-
-</div>
 
 <!-- MODAL TAMBAH / EDIT -->
 <div id="modalPertanyaan"
@@ -670,6 +775,46 @@
 </div>
 
 <script>
+    // ================= PINDAH TAB =================
+
+function gantiTab(tab) {
+
+    const kontenPertanyaan = document.getElementById('kontenPertanyaan');
+    const kontenSaran = document.getElementById('kontenSaran');
+
+    const tabPertanyaan = document.getElementById('tabPertanyaan');
+    const tabSaran = document.getElementById('tabSaran');
+
+    if (tab === 'pertanyaan') {
+
+        // Tampilkan daftar pertanyaan
+        kontenPertanyaan.classList.remove('hidden');
+        kontenSaran.classList.add('hidden');
+
+        // Aktifkan tab pertanyaan
+        tabPertanyaan.classList.add('border-blue-600', 'text-blue-600');
+        tabPertanyaan.classList.remove('border-transparent', 'text-gray-500');
+
+        // Nonaktifkan tab saran
+        tabSaran.classList.remove('border-blue-600', 'text-blue-600');
+        tabSaran.classList.add('border-transparent', 'text-gray-500');
+
+    } else {
+
+        // Tampilkan saran mahasiswa
+        kontenPertanyaan.classList.add('hidden');
+        kontenSaran.classList.remove('hidden');
+
+        // Aktifkan tab saran
+        tabSaran.classList.add('border-blue-600', 'text-blue-600');
+        tabSaran.classList.remove('border-transparent', 'text-gray-500');
+
+        // Nonaktifkan tab pertanyaan
+        tabPertanyaan.classList.remove('border-blue-600', 'text-blue-600');
+        tabPertanyaan.classList.add('border-transparent', 'text-gray-500');
+
+    }
+}
 
 // ================= MODAL TAMBAH =================
 

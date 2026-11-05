@@ -101,7 +101,7 @@ Route::prefix('dataentry')
         Route::post('/kirim-pertanyaan/{id}', [DataEntryController::class, 'kirim'])
             ->name('kirim');
         Route::put('/saran/{id}/status', [DataEntryController::class, 'updateStatusSaran'])
-        ->name('saran.status');
+        ->name('saran.update-status');
     });
 
 
