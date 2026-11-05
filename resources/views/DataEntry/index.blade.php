@@ -156,6 +156,136 @@
 
         </div>
 
+        <!-- SARAN PERTANYAAN MAHASISWA -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+
+    <div class="p-5 border-b flex justify-between items-center">
+        <div>
+            <h3 class="font-bold text-lg">
+                <i class="fa-solid fa-lightbulb mr-2 text-yellow-500"></i>
+                Saran Pertanyaan Mahasiswa
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">
+                Daftar pertanyaan yang disarankan oleh mahasiswa.
+            </p>
+        </div>
+
+        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
+            {{ $saranPertanyaans->where('status', 'baru')->count() }} Saran Baru
+        </span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+
+            <thead class="bg-gray-50 text-gray-600">
+                <tr>
+                    <th class="px-5 py-4 text-left">No</th>
+                    <th class="px-5 py-4 text-left">Pertanyaan Mahasiswa</th>
+                    <th class="px-5 py-4 text-left">Tanggal</th>
+                    <th class="px-5 py-4 text-center">Status</th>
+                    <th class="px-5 py-4 text-center">Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y">
+
+                @forelse($saranPertanyaans as $index => $saran)
+                    <tr class="hover:bg-gray-50">
+
+                        <td class="px-5 py-4">
+                            {{ $index + 1 }}
+                        </td>
+
+                        <td class="px-5 py-4 max-w-md">
+                            <p class="font-medium">
+                                {{ $saran->pertanyaan }}
+                            </p>
+                        </td>
+
+                        <td class="px-5 py-4">
+                            {{ $saran->created_at?->format('d/m/Y H:i') ?? '-' }}
+                        </td>
+
+                        <td class="px-5 py-4 text-center">
+                            @php
+                                $saranStatusClass = match($saran->status) {
+                                    'baru' => 'bg-yellow-100 text-yellow-700',
+                                    'diproses' => 'bg-blue-100 text-blue-700',
+                                    'selesai' => 'bg-green-100 text-green-700',
+                                    'ditolak' => 'bg-red-100 text-red-700',
+                                    default => 'bg-gray-100 text-gray-600'
+                                };
+                            @endphp
+
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $saranStatusClass }}">
+                                {{ ucfirst($saran->status) }}
+                            </span>
+                        </td>
+
+                        <td class="px-5 py-4">
+                            <div class="flex justify-center gap-2">
+
+                                @if($saran->status == 'baru')
+                                    <button
+                                        type="button"
+                                        onclick="gunakanSaran({{ json_encode($saran->pertanyaan) }}, {{ $saran->id }})"
+                                        class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-2 rounded"
+                                        title="Buat FAQ dari saran">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+
+                                    <form action="{{ route('dataentry.saran.status', $saran->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Tolak saran pertanyaan ini?')">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <input type="hidden" name="status" value="ditolak">
+
+                                        <button type="submit"
+                                            class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded"
+                                            title="Tolak saran">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </form>
+                                @elseif($saran->status == 'diproses')
+                                    <form action="{{ route('dataentry.saran.status', $saran->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Tandai saran ini sudah selesai ditindaklanjuti?')">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <input type="hidden" name="status" value="selesai">
+
+                                        <button type="submit"
+                                            class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-2 rounded"
+                                            title="Tandai selesai">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400 text-xs">Tidak ada aksi</span>
+                                @endif
+
+                            </div>
+                        </td>
+
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-10 text-gray-400">
+                            <i class="fa-solid fa-inbox text-4xl mb-3"></i>
+                            <p>Belum ada saran pertanyaan dari mahasiswa.</p>
+                        </td>
+                    </tr>
+                @endforelse
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
         <!-- FILTER -->
         <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
 
@@ -409,7 +539,7 @@
             method="POST">
 
             @csrf
-
+            <input type="hidden" name="saran_id" id="saranIdInput">
             <input type="hidden" name="_method" id="methodInput" value="POST">
 
             <div class="p-5 space-y-4">
@@ -555,6 +685,7 @@ function openTambahModal() {
     document.getElementById('kategoriInput').value = '';
     document.getElementById('pertanyaanInput').value = '';
     document.getElementById('jawabanInput').value = '';
+    document.getElementById('saranIdInput').value = '';
 
     const modal = document.getElementById('modalPertanyaan');
 
@@ -576,13 +707,26 @@ function editPertanyaan(item) {
     document.getElementById('kategoriInput').value = item.kategori_id;
     document.getElementById('pertanyaanInput').value = item.pertanyaan;
     document.getElementById('jawabanInput').value = item.jawaban;
+    document.getElementById('saranIdInput').value = '';
 
     const modal = document.getElementById('modalPertanyaan');
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }
+// ================= GUNAKAN SARAN MAHASISWA =================
 
+    function gunakanSaran(pertanyaan, saranId) {
+
+        openTambahModal();
+
+        document.getElementById('modalTitle').innerText =
+            'Buat FAQ dari Saran Mahasiswa';
+
+        document.getElementById('pertanyaanInput').value = pertanyaan;
+
+        document.getElementById('saranIdInput').value = saranId;
+    }
 // ================= TUTUP MODAL =================
 
 function closeModal() {
@@ -640,7 +784,7 @@ document.getElementById('modalDetail').addEventListener('click', function(e) {
     }
 });
 
-</script>
+</script>   
 
 </body>
 </html>

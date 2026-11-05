@@ -100,7 +100,8 @@ Route::prefix('dataentry')
 
         Route::post('/kirim-pertanyaan/{id}', [DataEntryController::class, 'kirim'])
             ->name('kirim');
-
+        Route::put('/saran/{id}/status', [DataEntryController::class, 'updateStatusSaran'])
+        ->name('saran.status');
     });
 
 
@@ -124,6 +125,7 @@ Route::prefix('validator')
         // Menolak pertanyaan
         Route::post('/pertanyaan/{pertanyaan}/reject', [ValidatorController::class, 'reject'])
             ->name('reject');
+        
 
     });
 
@@ -154,4 +156,5 @@ Route::prefix('superadmin')
 
         // Update Saran Mahasiswa
         Route::put('/saran/{id}', [SuperAdminController::class, 'updateSaran'])->name('saran.update');
+        
     });

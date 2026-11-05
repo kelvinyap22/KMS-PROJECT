@@ -57,24 +57,34 @@ class DataEntryController extends Controller
 
     // Tambah pertanyaan
     public function store(Request $request)
-    {
-        $request->validate([
-            'kategori_id' => 'required|exists:kategoris,id',
-            'pertanyaan' => 'required|string|max:255',
-            'jawaban' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'kategori_id' => 'required|exists:kategoris,id',
+        'pertanyaan' => 'required|string|max:255',
+        'jawaban' => 'required|string',
+        'saran_id' => 'nullable|exists:saran_pertanyaans,id',
+    ]);
 
-        Pertanyaan::create([
-            'kategori_id' => $request->kategori_id,
-            'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban,
-            'status' => 'draft',
-            'created_by' => auth()->id(),
-        ]);
+    Pertanyaan::create([
+        'kategori_id' => $request->kategori_id,
+        'pertanyaan' => $request->pertanyaan,
+        'jawaban' => $request->jawaban,
+        'status' => 'draft',
+        'created_by' => auth()->id(),
+    ]);
 
-        return redirect()->route('dataentry.index')
-            ->with('success', 'Pertanyaan berhasil ditambahkan.');
+    // Jika FAQ dibuat berdasarkan saran mahasiswa
+    if ($request->filled('saran_id')) {
+        SaranPertanyaan::where('id', $request->saran_id)
+            ->update([
+                'status' => 'diproses',
+                'ditangani_oleh' => auth()->id(),
+            ]);
     }
+
+    return redirect()->route('dataentry.index')
+        ->with('success', 'Pertanyaan berhasil ditambahkan.');
+}
 
     // Edit pertanyaan
     public function update(Request $request, $id)
@@ -124,5 +134,22 @@ class DataEntryController extends Controller
 
         return redirect()->route('dataentry.index')
             ->with('success', 'Pertanyaan berhasil dikirim ke Validator.');
+    }
+    // Menandai saran sebagai selesai atau ditolak
+    public function updateStatusSaran(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:selesai,ditolak',
+        ]);
+
+        $saran = SaranPertanyaan::findOrFail($id);
+
+        $saran->update([
+            'status' => $request->status,
+            'ditangani_oleh' => auth()->id(),
+        ]);
+
+        return redirect()->route('dataentry.index')
+            ->with('success', 'Status saran pertanyaan berhasil diperbarui.');
     }
 }
