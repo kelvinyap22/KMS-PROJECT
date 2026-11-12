@@ -607,7 +607,7 @@
                             @empty
 
                                 <tr>
-                                    <td colspan="5" class="text-center py-12 text-gray-400">
+                                    <td colspan="6" class="text-center py-12 text-gray-400">
 
                                         <i class="fa-solid fa-inbox text-4xl mb-3"></i>
 
@@ -630,9 +630,9 @@
 
 <!-- MODAL TAMBAH / EDIT -->
 <div id="modalPertanyaan"
-    class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto p-4">
 
-    <div class="bg-white rounded-xl w-full max-w-xl mx-4 shadow-xl">
+    <div class="bg-white rounded-xl w-full max-w-xl shadow-xl my-auto max-h-[90vh] overflow-y-auto">
 
         <div class="flex justify-between items-center p-5 border-b">
 
@@ -657,25 +657,98 @@
 
             <div class="p-5 space-y-4">
 
-                <div>
-                    <label class="block font-medium mb-2">
-                        Kategori
-                    </label>
 
-                    <select name="kategori_id" id="kategoriInput"
-                        required
-                        class="w-full border rounded-lg px-4 py-2">
+<!-- PERINGATAN PERTANYAAN MIRIP -->
+@if(session('similar_questions'))
 
-                        <option value="">Pilih Kategori</option>
+    <div id="similarQuestionsWarning"
+        class="bg-yellow-50 border border-yellow-300 rounded-xl p-4">
 
-                        @foreach($kategoris as $kategori)
-                            <option value="{{ $kategori->id }}">
-                                {{ $kategori->nama }}
-                            </option>
-                        @endforeach
+        <div class="flex items-center gap-2 text-yellow-800 font-bold mb-2">
 
-                    </select>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+            Pertanyaan Serupa Ditemukan!
+
+        </div>
+
+        <p class="text-sm text-yellow-800 mb-3">
+            Sistem menemukan pertanyaan yang mirip dengan data yang sudah ada.
+            Silakan periksa sebelum melanjutkan.
+        </p>
+
+        <div class="space-y-3">
+
+            @foreach(session('similar_questions') as $similar)
+
+                <div class="bg-white border border-yellow-200 rounded-lg p-3">
+
+                    <p class="font-semibold text-sm text-gray-800">
+                        {{ $similar['pertanyaan'] }}
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+
+                        <span class="text-xs text-gray-500">
+                            ID: {{ $similar['id'] }}
+                        </span>
+
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">
+                            {{ $similar['similarity'] }}% Mirip
+                        </span>
+
+                        <span class="text-xs text-gray-500">
+                            Status: {{ ucfirst($similar['status']) }}
+                        </span>
+
+                    </div>
+
                 </div>
+
+            @endforeach
+
+        </div>
+
+        <p class="text-xs text-yellow-800 mt-3">
+            Jika pertanyaan baru memang berbeda, kamu tetap dapat menyimpannya.
+        </p>
+
+    </div>
+
+@endif
+
+
+                <div>
+    <label class="block font-medium mb-2">
+        Kategori
+    </label>
+
+    <select name="kategori_id"
+        id="kategoriInput"
+        required
+        @if(session('similar_questions')) disabled @endif
+        class="w-full border rounded-lg px-4 py-2
+        @if(session('similar_questions'))
+            bg-gray-100 cursor-not-allowed
+        @endif">
+
+        <option value="">Pilih Kategori</option>
+
+        @foreach($kategoris as $kategori)
+            <option value="{{ $kategori->id }}"
+                {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                {{ $kategori->nama }}
+            </option>
+        @endforeach
+
+    </select>
+
+    {{-- Agar kategori tetap terkirim meskipun select disabled --}}
+    @if(session('similar_questions'))
+        <input type="hidden" name="kategori_id"
+            value="{{ old('kategori_id') }}">
+    @endif
+</div>
 
                 <div>
                     <label class="block font-medium mb-2">
@@ -686,7 +759,9 @@
                         id="pertanyaanInput"
                         rows="3"
                         required
-                        class="w-full border rounded-lg px-4 py-2"
+                        @if(session('similar_questions')) readonly @endif
+                        class="w-full border rounded-lg px-4 py-2
+                        @if(session('similar_questions')) bg-gray-100 cursor-not-allowed @endif"
                         placeholder="Masukkan pertanyaan"></textarea>
                 </div>
 
@@ -699,7 +774,9 @@
                         id="jawabanInput"
                         rows="4"
                         required
-                        class="w-full border rounded-lg px-4 py-2"
+                        @if(session('similar_questions')) readonly @endif
+                        class="w-full border rounded-lg px-4 py-2
+                        @if(session('similar_questions')) bg-gray-100 cursor-not-allowed @endif"
                         placeholder="Masukkan jawaban"></textarea>
                 </div>
 
@@ -707,19 +784,34 @@
 
             <div class="p-5 border-t flex justify-end gap-3">
 
-                <button type="button"
-                    onclick="closeModal()"
-                    class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">
-                    Batal
-                </button>
+    <button type="button"
+        onclick="closeModal()"
+        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg">
+        Batal
+    </button>
 
-                <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-                    <i class="fa-solid fa-save mr-1"></i>
-                    Simpan
-                </button>
+    <input type="hidden"
+        name="force_save"
+        id="forceSaveInput"
+        value="0">
 
-            </div>
+    <button type="submit"
+        id="btnTetapSimpan"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg">
+
+        <i class="fa-solid fa-save mr-1"></i>
+
+        <span id="teksTombolSimpan">
+            @if(session('similar_questions'))
+                Tetap Simpan
+            @else
+                Simpan
+            @endif
+        </span>
+
+    </button>
+
+</div>
 
         </form>
 
@@ -843,70 +935,132 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ================= MODAL TAMBAH =================
+let adaPertanyaanMirip = @json(session()->has('similar_questions'));
 
 function openTambahModal() {
+    const form = document.getElementById('formPertanyaan');
+    const modal = document.getElementById('modalPertanyaan');
+    const warning = document.getElementById('similarQuestionsWarning');
 
     document.getElementById('modalTitle').innerText = 'Tambah Pertanyaan';
-
-    document.getElementById('formPertanyaan').action =
-        "{{ route('dataentry.store') }}";
-
+    form.action = "{{ route('dataentry.store') }}";
     document.getElementById('methodInput').value = 'POST';
 
+    // Siapkan form baru dalam keadaan kosong dan aktif.
+    form.reset();
     document.getElementById('kategoriInput').value = '';
     document.getElementById('pertanyaanInput').value = '';
     document.getElementById('jawabanInput').value = '';
     document.getElementById('saranIdInput').value = '';
 
-    const modal = document.getElementById('modalPertanyaan');
+    adaPertanyaanMirip = false;
+    document.getElementById('forceSaveInput').value = '0';
+
+    document.getElementById('kategoriInput').disabled = false;
+    document.getElementById('pertanyaanInput').readOnly = false;
+    document.getElementById('jawabanInput').readOnly = false;
+
+    // Hapus juga tampilan terkunci dari CSS agar cursor kembali normal.
+    document.getElementById('kategoriInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('pertanyaanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('jawabanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+
+    document.getElementById('teksTombolSimpan').innerText = 'Simpan';
+
+    if (warning) {
+        warning.classList.add('hidden');
+    }
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }
 
 // ================= MODAL EDIT =================
-
 function editPertanyaan(item) {
+    const form = document.getElementById('formPertanyaan');
+    const modal = document.getElementById('modalPertanyaan');
+    const warning = document.getElementById('similarQuestionsWarning');
 
+    form.reset();
     document.getElementById('modalTitle').innerText = 'Edit Pertanyaan';
-
-    document.getElementById('formPertanyaan').action =
-        `/dataentry/update-pertanyaan/${item.id}`;
-
+    form.action = `/dataentry/update-pertanyaan/${item.id}`;
     document.getElementById('methodInput').value = 'PUT';
 
-    document.getElementById('kategoriInput').value = item.kategori_id;
-    document.getElementById('pertanyaanInput').value = item.pertanyaan;
-    document.getElementById('jawabanInput').value = item.jawaban;
-    document.getElementById('saranIdInput').value = '';
+    // Pastikan semua field aktif saat mengedit.
+    document.getElementById('kategoriInput').disabled = false;
+    document.getElementById('pertanyaanInput').readOnly = false;
+    document.getElementById('jawabanInput').readOnly = false;
 
-    const modal = document.getElementById('modalPertanyaan');
+    // Hapus juga tampilan terkunci dari CSS agar cursor kembali normal.
+    document.getElementById('kategoriInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('pertanyaanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('jawabanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+
+    document.getElementById('kategoriInput').value = item.kategori_id ?? '';
+    document.getElementById('pertanyaanInput').value = item.pertanyaan ?? '';
+    document.getElementById('jawabanInput').value = item.jawaban ?? '';
+    document.getElementById('saranIdInput').value = '';
+    document.getElementById('forceSaveInput').value = '0';
+    document.getElementById('teksTombolSimpan').innerText = 'Simpan';
+
+    adaPertanyaanMirip = false;
+
+    if (warning) {
+        warning.classList.add('hidden');
+    }
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 }
+
 // ================= GUNAKAN SARAN MAHASISWA =================
+function gunakanSaran(pertanyaan, saranId) {
+    openTambahModal();
 
-    function gunakanSaran(pertanyaan, saranId) {
+    document.getElementById('modalTitle').innerText =
+        'Buat FAQ dari Saran Mahasiswa';
 
-        openTambahModal();
+    document.getElementById('pertanyaanInput').value = pertanyaan;
+    document.getElementById('saranIdInput').value = saranId;
+}
 
-        document.getElementById('modalTitle').innerText =
-            'Buat FAQ dari Saran Mahasiswa';
-
-        document.getElementById('pertanyaanInput').value = pertanyaan;
-
-        document.getElementById('saranIdInput').value = saranId;
-    }
 // ================= TUTUP MODAL =================
-
 function closeModal() {
-
     const modal = document.getElementById('modalPertanyaan');
+    const form = document.getElementById('formPertanyaan');
+    const warning = document.getElementById('similarQuestionsWarning');
 
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+
+    // Reset seluruh kondisi agar modal berikutnya tidak mewarisi status kemiripan.
+    form.reset();
+    adaPertanyaanMirip = false;
+
+    document.getElementById('forceSaveInput').value = '0';
+    document.getElementById('kategoriInput').disabled = false;
+    document.getElementById('pertanyaanInput').readOnly = false;
+    document.getElementById('jawabanInput').readOnly = false;
+
+    // Hapus juga tampilan terkunci dari CSS agar cursor kembali normal.
+    document.getElementById('kategoriInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('pertanyaanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('jawabanInput').classList.remove('bg-gray-100', 'cursor-not-allowed');
+    document.getElementById('teksTombolSimpan').innerText = 'Simpan';
+    document.getElementById('saranIdInput').value = '';
+
+    if (warning) {
+        warning.classList.add('hidden');
+    }
 }
+
+// Saat form dikirim:
+// - Pengiriman pertama selalu force_save=0 agar Controller memeriksa kemiripan.
+// - Setelah peringatan muncul, tombol "Tetap Simpan" mengirim force_save=1.
+document.getElementById('formPertanyaan').addEventListener('submit', function () {
+    document.getElementById('forceSaveInput').value =
+        adaPertanyaanMirip ? '1' : '0';
+});
 
 // ================= DETAIL =================
 
@@ -953,6 +1107,50 @@ document.getElementById('modalDetail').addEventListener('click', function(e) {
     if (e.target === this) {
         closeDetail();
     }
+});
+
+// ========================================
+// MEMBUKA KEMBALI MODAL JIKA ADA PERTANYAAN MIRIP
+// ========================================
+document.addEventListener('DOMContentLoaded', function () {
+    const warning = document.getElementById('similarQuestionsWarning');
+
+    if (!warning) {
+        return;
+    }
+
+    // openTambahModal() mengosongkan form; setelah itu pulihkan data lama.
+    openTambahModal();
+
+    document.getElementById('kategoriInput').value =
+        @json(old('kategori_id'));
+
+    document.getElementById('pertanyaanInput').value =
+        @json(old('pertanyaan'));
+
+    document.getElementById('jawabanInput').value =
+        @json(old('jawaban'));
+
+    document.getElementById('saranIdInput').value =
+        @json(old('saran_id'));
+
+    // Aktifkan mode konfirmasi kemiripan.
+    adaPertanyaanMirip = true;
+    document.getElementById('forceSaveInput').value = '0';
+
+    // Kunci ketiga field agar tidak berubah setelah sistem menemukan kemiripan.
+    document.getElementById('kategoriInput').disabled = true;
+    document.getElementById('pertanyaanInput').readOnly = true;
+    document.getElementById('jawabanInput').readOnly = true;
+
+    document.getElementById('teksTombolSimpan').innerText = 'Tetap Simpan';
+
+    // Tampilkan kembali peringatan setelah openTambahModal() menyembunyikannya.
+    warning.classList.remove('hidden');
+
+    const modal = document.getElementById('modalPertanyaan');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 });
 
 </script>   
