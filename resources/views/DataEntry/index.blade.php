@@ -133,9 +133,9 @@
             <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-sm">Approved</p>
+                        <p class="text-gray-500 text-sm">Published</p>
                         <h3 class="text-3xl font-bold mt-2">
-                            {{ $totalApproved }}
+                            {{ $totalPublished }}
                         </h3>
                     </div>
                     <i class="fa-solid fa-circle-check text-3xl text-green-500"></i>
@@ -207,7 +207,7 @@
                         <option value="">Semua Status</option>
                         <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
                         <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
 
                     </select>
@@ -394,7 +394,7 @@
                                             @endif
 
                                             <!-- HAPUS -->
-                                            @if($item->status != 'pending')
+                                            @if(!in_array($item->status, ['pending', 'published']))
 
                                                 <form action="{{ route('dataentry.destroy', $item->id) }}"
                                                     method="POST"
@@ -478,6 +478,7 @@
                         <thead class="bg-gray-50 text-gray-600">
                             <tr>
                                 <th class="px-5 py-4 text-left">No</th>
+                                <th class="px-5 py-4 text-left">NRP</th>
                                 <th class="px-5 py-4 text-left">Pertanyaan Mahasiswa</th>
                                 <th class="px-5 py-4 text-left">Tanggal</th>
                                 <th class="px-5 py-4 text-center">Status</th>
@@ -493,6 +494,13 @@
 
                                     <td class="px-5 py-4">
                                         {{ $index + 1 }}
+                                    </td>
+
+                                    <!-- NRP MAHASISWA -->
+                                    <td class="px-5 py-4">
+                                        <span class="font-medium text-gray-700">
+                                            {{ $saran->mahasiswa->nrp ?? '-' }}
+                                        </span>
                                     </td>
 
                                     <td class="px-5 py-4 max-w-md">
@@ -777,6 +785,7 @@
 <script>
     // ================= PINDAH TAB =================
 
+
 function gantiTab(tab) {
 
     const kontenPertanyaan = document.getElementById('kontenPertanyaan');
@@ -784,6 +793,9 @@ function gantiTab(tab) {
 
     const tabPertanyaan = document.getElementById('tabPertanyaan');
     const tabSaran = document.getElementById('tabSaran');
+
+    // Simpan tab terakhir yang dipilih
+    localStorage.setItem('tabDataEntry', tab);
 
     if (tab === 'pertanyaan') {
 
@@ -815,6 +827,20 @@ function gantiTab(tab) {
 
     }
 }
+
+
+// ================= MEMULIHKAN TAB TERAKHIR =================
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Ambil tab terakhir yang tersimpan
+    const tabTerakhir = localStorage.getItem('tabDataEntry');
+
+    // Jika belum ada pilihan sebelumnya, tampilkan daftar pertanyaan
+    gantiTab(tabTerakhir || 'pertanyaan');
+
+});
+
 
 // ================= MODAL TAMBAH =================
 

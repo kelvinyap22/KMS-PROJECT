@@ -22,43 +22,52 @@
 
 <body class="bg-gray-50 min-h-screen text-gray-800">
 
-    <!-- HEADER -->
-    <header class="bg-white border-b shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    
+<!-- HEADER -->
+<header class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
 
-            <div>
-                <h1 class="font-bold text-xl text-gray-900">
-                    KMS FAQ UBAYA
+        <!-- LOGO DAN JUDUL -->
+        <div>
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-book-open text-blue-700 text-2xl"></i>
+
+                <h1 class="font-bold text-2xl text-blue-700">
+                    Knowledge Management System
                 </h1>
+            </div>
+
+            <p class="text-sm text-gray-500 mt-0.5">
+                Dashboard Validator
+            </p>
+        </div>
+
+        <!-- INFORMASI USER DAN LOGOUT -->
+        <div class="flex items-center gap-4">
+
+            <div class="text-right hidden sm:block">
+                <p class="text-sm font-semibold">
+                    {{ auth()->user()->name }}
+                </p>
                 <p class="text-xs text-gray-500">
-                    Portal Staff - Validator
+                    Validator
                 </p>
             </div>
 
-            <div class="flex items-center gap-4">
+            <form action="{{ route('staff.logout') }}" method="POST">
+                @csrf
 
-                <div class="text-right hidden sm:block">
-                    <p class="text-sm font-semibold">
-                        {{ auth()->user()->name }}
-                    </p>
-                    <p class="text-xs text-gray-500">
-                        Validator
-                    </p>
-                </div>
+                <button type="submit"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg text-sm transition">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i>
+                    Logout
+                </button>
+            </form>
 
-                <form action="{{ route('staff.logout') }}" method="POST">
-                    @csrf
-
-                    <button type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i>
-                        Logout
-                    </button>
-                </form>
-
-            </div>
         </div>
-    </header>
+    </div>
+</header>
+
 
 
     <!-- MAIN CONTENT -->

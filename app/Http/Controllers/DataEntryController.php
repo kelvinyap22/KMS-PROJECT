@@ -35,20 +35,22 @@ class DataEntryController extends Controller
 
         $totalPending = Pertanyaan::where('status', 'pending')->count();
 
-        $totalApproved = Pertanyaan::where('status', 'approved')->count();
+        $totalPublished = Pertanyaan::where('status', 'published')->count();
 
         $totalDraft = Pertanyaan::where('status', 'draft')->count();
 
         $totalRejected = Pertanyaan::where('status', 'rejected')->count();
 
-        $saranPertanyaans = SaranPertanyaan::latest()->get();
+        $saranPertanyaans = SaranPertanyaan::with('mahasiswa')
+    ->latest()
+    ->get();
 
         return view('dataentry.index', compact(
             'pertanyaans',
             'kategoris',
             'totalPertanyaan',
             'totalPending',
-            'totalApproved',
+            'totalPublished',
             'totalDraft',
             'totalRejected',
             'saranPertanyaans'
