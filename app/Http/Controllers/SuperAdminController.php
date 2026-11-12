@@ -54,7 +54,6 @@ class SuperAdminController extends Controller
         $users            = User::with('role')->latest()->paginate(10, ['*'], 'user_page');
         $roles            = Role::all();
         $saranPertanyaans = SaranPertanyaan::with(['mahasiswa', 'petugas'])->latest()->paginate(10, ['*'], 'saran_page');
-        $staffUsers       = User::whereIn('role_id', [1, 2, 3])->get();
 
         return view('SuperAdmin.index', compact(
             'pertanyaans',
@@ -62,7 +61,6 @@ class SuperAdminController extends Controller
             'users',
             'roles',
             'saranPertanyaans',
-            'staffUsers',
             'totalPertanyaan',
             'totalPending',
             'totalPublished',
@@ -169,70 +167,42 @@ class SuperAdminController extends Controller
         return back()->with('success', 'Kategori berhasil dihapus.');
     }
 
-    // CRUD PERTANYAAN FAQ
+    // EDIT PERTANYAAN FAQ (KHUSUS STATUS PUBLISHED)
     public function updatePertanyaan(Request $request, $id)
     {
         $this->checkSuperAdmin();
         $pertanyaan = Pertanyaan::findOrFail($id);
 
+        if ($pertanyaan->status !== 'published') {
+            return back()->with('error', 'Super Admin hanya dapat mengedit pertanyaan yang sudah berstatus Published.');
+        }
+
         $request->validate([
-            'kategori_id'    => 'required|exists:kategoris,id',
-            'pertanyaan'     => 'required|string',
-            'jawaban'        => 'required|string',
-            'status'         => 'required|in:pending,published,rejected',
-            'catatan_review' => 'required_if:status,rejected|nullable|string|max:1000',
-        ], [
-            'catatan_review.required_if' => 'Catatan penolakan wajib diisi jika status diubah menjadi Rejected.',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'pertanyaan'  => 'required|string',
+            'jawaban'     => 'required|string',
         ]);
 
-        $dataToUpdate = [
+        $pertanyaan->update([
             'kategori_id' => $request->kategori_id,
             'pertanyaan'  => $request->pertanyaan,
             'jawaban'     => $request->jawaban,
-            'status'      => $request->status,
-        ];
-
-        // Otomatis catat ID Super Admin & Waktu Verifikasi saat Published/Rejected
-        if (in_array($request->status, ['published', 'rejected'])) {
-            $dataToUpdate['reviewed_by'] = auth()->id();
-            $dataToUpdate['reviewed_at'] = now();
-        }
-
-        // Kelola Catatan Penolakan
-        if ($request->status === 'rejected') {
-            $dataToUpdate['catatan_review'] = $request->catatan_review;
-        } elseif ($request->status === 'published') {
-            $dataToUpdate['catatan_review'] = null; // Reset catatan jika disetujui
-        }
-
-        $pertanyaan->update($dataToUpdate);
+        ]);
 
         return back()->with('success', 'Pertanyaan FAQ berhasil diperbarui.');
     }
 
+    // HAPUS PERTANYAAN FAQ (KHUSUS STATUS PUBLISHED)
     public function destroyPertanyaan($id)
     {
         $this->checkSuperAdmin();
-        Pertanyaan::findOrFail($id)->delete();
+        $pertanyaan = Pertanyaan::findOrFail($id);
+
+        if ($pertanyaan->status !== 'published') {
+            return back()->with('error', 'Super Admin hanya dapat menghapus pertanyaan yang sudah berstatus Published.');
+        }
+
+        $pertanyaan->delete();
         return back()->with('success', 'Pertanyaan FAQ berhasil dihapus.');
-    }
-
-    // UPDATE SARAN MAHASISWA
-    public function updateSaran(Request $request, $id)
-    {
-        $this->checkSuperAdmin();
-        $saran = SaranPertanyaan::findOrFail($id);
-
-        $request->validate([
-            'status'         => 'required|in:baru,diproses,selesai,ditolak',
-            'ditangani_oleh' => 'nullable|exists:users,id',
-        ]);
-
-        $saran->update([
-            'status'         => $request->status,
-            'ditangani_oleh' => $request->ditangani_oleh,
-        ]);
-
-        return back()->with('success', 'Status saran pertanyaan berhasil diperbarui.');
     }
 }

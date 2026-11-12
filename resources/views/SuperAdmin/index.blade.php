@@ -72,7 +72,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900">Dashboard Super Admin</h2>
-                <p class="text-gray-500 text-sm">Kelola pengguna, kategori, publikasi FAQ, dan saran pertanyaan mahasiswa.</p>
+                <p class="text-gray-500 text-sm">Kelola pengguna, kategori, publikasi FAQ, dan monitoring saran pertanyaan mahasiswa.</p>
             </div>
 
             <div class="flex flex-wrap gap-3">
@@ -122,7 +122,7 @@
 
         <!-- TAB NAVIGASI -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-2 mb-6 flex flex-wrap gap-2">
-            <button onclick="switchTab('faq')" id="tab-faq" class="tab-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition bg-blue-600 text-white shadow-sm">
+            <button onclick="switchTab('faq')" id="tab-faq" class="tab-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition text-gray-600 hover:bg-gray-100">
                 <i class="fa-solid fa-list mr-2"></i> Master FAQ
             </button>
             <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition text-gray-600 hover:bg-gray-100">
@@ -137,7 +137,7 @@
         </div>
 
         <!-- TAB 1: MASTER FAQ -->
-        <div id="content-faq" class="tab-content block">
+        <div id="content-faq" class="tab-content hidden">
             <div class="bg-white p-5 rounded-xl shadow-sm mb-6 border border-gray-100">
                 <form action="{{ route('superadmin.dashboard') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -252,24 +252,27 @@
                                     </td>
                                     <td class="px-5 py-4 text-center">
                                         <div class="flex justify-center items-center gap-1.5">
-                                            <!-- DETAIL -->
+                                            <!-- DETAIL (Tampil untuk semua status: pending, published, rejected) -->
                                             <button onclick="openModalDetailFaq({{ json_encode($item->load(['kategori', 'creator', 'reviewer'])) }})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-2 rounded-lg text-xs" title="Lihat Detail & Audit">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
 
-                                            <!-- EDIT -->
-                                            <button onclick="openModalEditFaq({{ json_encode($item) }})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 p-2 rounded-lg text-xs" title="Edit FAQ">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-
-                                            <!-- HAPUS -->
-                                            <form action="{{ route('superadmin.pertanyaan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pertanyaan ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg text-xs" title="Hapus FAQ">
-                                                    <i class="fa-solid fa-trash"></i>
+                                            <!-- EDIT & HAPUS (Hanya muncul jika status sudah Published) -->
+                                            @if($item->status === 'published')
+                                                <!-- EDIT -->
+                                                <button onclick="openModalEditFaq({{ json_encode($item) }})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 p-2 rounded-lg text-xs" title="Edit FAQ">
+                                                    <i class="fa-solid fa-pen"></i>
                                                 </button>
-                                            </form>
+
+                                                <!-- HAPUS -->
+                                                <form action="{{ route('superadmin.pertanyaan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pertanyaan ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg text-xs" title="Hapus FAQ">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -408,13 +411,16 @@
             </div>
         </div>
 
-        <!-- TAB 4: SARAN MAHASISWA -->
+        <!-- TAB 4: SARAN MAHASISWA (MONITORING ONLY) -->
         <div id="content-saran" class="tab-content hidden">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div class="p-5 border-b flex justify-between items-center bg-gray-50">
                     <h3 class="font-bold text-gray-900 flex items-center">
-                        <i class="fa-solid fa-comments mr-2 text-green-600"></i> Umpan Balik / Saran Pertanyaan Mahasiswa
+                        <i class="fa-solid fa-comments mr-2 text-green-600"></i> Monitoring Saran Pertanyaan Mahasiswa
                     </h3>
+                    <span class="text-xs font-semibold px-3 py-1 bg-green-100 text-green-700 rounded-full">
+                        {{ $saranPertanyaans->total() }} Total Saran
+                    </span>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -425,7 +431,6 @@
                                 <th class="px-5 py-4">Isi Pertanyaan/Saran</th>
                                 <th class="px-5 py-4 text-center">Status</th>
                                 <th class="px-5 py-4 text-center">Ditangani Oleh</th>
-                                <th class="px-5 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -434,26 +439,34 @@
                                     <td class="px-5 py-4 font-semibold text-blue-700">{{ $saran->mahasiswa->nrp ?? 'Mahasiswa' }}</td>
                                     <td class="px-5 py-4 text-gray-800 leading-relaxed max-w-md">{{ $saran->pertanyaan }}</td>
                                     <td class="px-5 py-4 text-center">
-                                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                                        @php
+                                            $saranBadge = match($saran->status) {
+                                                'baru' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                'diproses' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                                'selesai' => 'bg-green-100 text-green-800 border-green-200',
+                                                'ditolak' => 'bg-red-100 text-red-800 border-red-200',
+                                                default => 'bg-gray-100 text-gray-700 border-gray-200'
+                                            };
+                                        @endphp
+                                        <span class="px-3 py-1 border rounded-full text-xs font-semibold {{ $saranBadge }}">
                                             {{ ucfirst($saran->status) }}
                                         </span>
                                     </td>
-                                    <td class="px-5 py-4 text-center text-xs text-gray-500">
-                                        {{ $saran->petugas->name ?? 'Belum Ditugaskan' }}
-                                    </td>
-                                    <td class="px-5 py-4 text-center">
-                                        <button onclick="openModalSaran({{ json_encode($saran) }})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold">
-                                            Kelola Status
-                                        </button>
+                                    <td class="px-5 py-4 text-center text-xs text-gray-600">
+                                        {{ $saran->petugas->name ?? 'Belum Diproses' }}
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-8 text-gray-400">Belum ada saran dari mahasiswa.</td>
+                                    <td colspan="4" class="text-center py-8 text-gray-400">Belum ada saran dari mahasiswa.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="p-4 border-t">
+                    {{ $saranPertanyaans->links() }}
                 </div>
             </div>
         </div>
@@ -532,21 +545,21 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT FAQ (DENGAN VERTICAL SCROLLBAR DAN FOOTER TETAP) -->
+    <!-- MODAL EDIT FAQ (KHUSUS STATUS PUBLISHED) -->
     <div id="modalFaq" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <!-- Header (Fixed) -->
             <div class="p-5 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
-                <h3 class="font-bold text-gray-900">Edit Pertanyaan FAQ</h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-gray-900">Edit Pertanyaan FAQ</h3>
+                    <span class="px-2.5 py-0.5 bg-green-100 text-green-800 border border-green-200 rounded-full text-xs font-semibold">Published</span>
+                </div>
                 <button type="button" onclick="closeModal('modalFaq')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <!-- Form Wrapper -->
             <form id="formFaq" method="POST" class="flex flex-col flex-1 overflow-hidden">
                 @csrf
                 @method('PUT')
 
-                <!-- Scrollable Body -->
                 <div class="p-5 space-y-4 overflow-y-auto flex-1">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
@@ -558,34 +571,16 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Publikasi</label>
-                        <select name="status" id="faqStatus" onchange="toggleCatatanReview(this.value)" required class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="pending">Pending</option>
-                            <option value="published">Published</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-
-                    <!-- CONTAINER CATATAN PENOLAKAN -->
-                    <div id="faqCatatanInputContainer" class="hidden">
-                        <label class="block text-sm font-medium text-red-700 mb-1">
-                            Catatan Review / Alasan Penolakan <span class="text-red-500">*</span>
-                        </label>
-                        <textarea name="catatan_review" id="faqCatatanReview" rows="2" placeholder="Masukkan alasan kenapa pertanyaan/jawaban ini ditolak..." class="w-full border border-red-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-red-500 bg-red-50/30"></textarea>
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Pertanyaan</label>
                         <textarea name="pertanyaan" id="faqPertanyaan" rows="2" required class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Jawaban</label>
-                        <textarea name="jawaban" id="faqJawaban" rows="3" required class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <textarea name="jawaban" id="faqJawaban" rows="4" required class="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
                 </div>
 
-                <!-- Footer (Fixed at bottom) -->
                 <div class="p-4 bg-gray-50 border-t flex justify-end gap-2 flex-shrink-0">
                     <button type="button" onclick="closeModal('modalFaq')" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Update FAQ</button>
@@ -637,49 +632,12 @@
         </div>
     </div>
 
-    <!-- MODAL SARAN MAHASISWA -->
-    <div id="modalSaran" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
-                <h3 class="font-bold text-gray-900">Kelola Saran Pertanyaan</h3>
-                <button type="button" onclick="closeModal('modalSaran')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form id="formSaran" method="POST" class="flex flex-col flex-1 overflow-hidden">
-                @csrf
-                @method('PUT')
-
-                <div class="p-5 space-y-4 overflow-y-auto flex-1">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status Saran</label>
-                        <select name="status" id="saranStatus" required class="w-full border rounded-lg px-3 py-2 text-sm">
-                            <option value="baru">Baru</option>
-                            <option value="diproses">Diproses</option>
-                            <option value="selesai">Selesai</option>
-                            <option value="ditolak">Ditolak</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tugaskan Kepada Staf</label>
-                        <select name="ditangani_oleh" id="saranStaff" class="w-full border rounded-lg px-3 py-2 text-sm">
-                            <option value="">-- Belum Ditugaskan --</option>
-                            @foreach($staffUsers as $staf)
-                                <option value="{{ $staf->id }}">{{ $staf->name }} ({{ $staf->role->nama ?? 'Staff' }})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-gray-50 border-t flex justify-end gap-2 flex-shrink-0">
-                    <button type="button" onclick="closeModal('modalSaran')" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Update Saran</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- JAVASCRIPT HANDLERS -->
     <script>
         function switchTab(tabName) {
+            const validTabs = ['faq', 'users', 'kategori', 'saran'];
+            if (!validTabs.includes(tabName)) tabName = 'faq';
+
             document.querySelectorAll('.tab-content').forEach(el => {
                 el.classList.add('hidden');
                 el.classList.remove('block');
@@ -688,12 +646,33 @@
                 btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
                 btn.classList.add('text-gray-600', 'hover:bg-gray-100');
             });
+
             document.getElementById('content-' + tabName).classList.remove('hidden');
             document.getElementById('content-' + tabName).classList.add('block');
+
             const activeBtn = document.getElementById('tab-' + tabName);
             activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
             activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+
+            // Simpan tab aktif ke localStorage agar tetap bertahan saat refresh
+            localStorage.setItem('superadmin_active_tab', tabName);
         }
+
+        // Pulihkan tab aktif saat halaman dimuat/di-refresh
+        (function restoreActiveTab() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.has('user_page')) {
+                switchTab('users');
+            } else if (urlParams.has('saran_page')) {
+                switchTab('saran');
+            } else if (urlParams.has('faq_page') || urlParams.has('search') || urlParams.has('kategori') || urlParams.has('status')) {
+                switchTab('faq');
+            } else {
+                const savedTab = localStorage.getItem('superadmin_active_tab') || 'faq';
+                switchTab(savedTab);
+            }
+        })();
 
         function openModal(id) {
             const m = document.getElementById(id);
@@ -749,28 +728,12 @@
             openModal('modalKategori');
         }
 
-        function toggleCatatanReview(status) {
-            const container = document.getElementById('faqCatatanInputContainer');
-            const textarea = document.getElementById('faqCatatanReview');
-
-            if (status === 'rejected') {
-                container.classList.remove('hidden');
-                textarea.required = true;
-            } else {
-                container.classList.add('hidden');
-                textarea.required = false;
-            }
-        }
-
         function openModalEditFaq(item) {
+            if (item.status !== 'published') return;
             document.getElementById('formFaq').action = `/superadmin/pertanyaan/${item.id}`;
             document.getElementById('faqKategoriId').value = item.kategori_id;
-            document.getElementById('faqStatus').value = item.status;
             document.getElementById('faqPertanyaan').value = item.pertanyaan;
             document.getElementById('faqJawaban').value = item.jawaban;
-            document.getElementById('faqCatatanReview').value = item.catatan_review || '';
-
-            toggleCatatanReview(item.status);
             openModal('modalFaq');
         }
 
@@ -793,13 +756,6 @@
             }
 
             openModal('modalDetailFaq');
-        }
-
-        function openModalSaran(saran) {
-            document.getElementById('formSaran').action = `/superadmin/saran/${saran.id}`;
-            document.getElementById('saranStatus').value = saran.status;
-            document.getElementById('saranStaff').value = saran.ditangani_oleh || '';
-            openModal('modalSaran');
         }
     </script>
 </body>
