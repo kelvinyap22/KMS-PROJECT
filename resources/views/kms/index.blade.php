@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -39,56 +38,56 @@
         }
     </script>
     
-<style>
-    /* Animasi dropdown FAQ */
-    .faq-answer {
-        display: grid;
-        grid-template-rows: 0fr;
-        opacity: 0;
-        transition:
-            grid-template-rows 350ms ease,
-            opacity 300ms ease;
-    }
-
-    .faq-answer.open {
-        grid-template-rows: 1fr;
-        opacity: 1;
-    }
-
-    .faq-answer-inner {
-        overflow: hidden;
-        min-height: 0;
-    }
-
-    /* Animasi ikon chevron */
-    .faq-chevron {
-        transition: transform 350ms ease;
-    }
-
-    .faq-chevron.rotate {
-        transform: rotate(180deg);
-    }
-
-    /* Animasi hover card */
-    .faq-card {
-        transition:
-            border-color 250ms ease,
-            box-shadow 250ms ease,
-            transform 250ms ease;
-    }
-
-    .faq-card:hover {
-        transform: translateY(-1px);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .faq-answer,
-        .faq-chevron,
-        .faq-card {
-            transition: none;
+    <style>
+        /* Animasi dropdown FAQ */
+        .faq-answer {
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            transition:
+                grid-template-rows 350ms ease,
+                opacity 300ms ease;
         }
-    }
-</style>
+
+        .faq-answer.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        .faq-answer-inner {
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* Animasi ikon chevron */
+        .faq-chevron {
+            transition: transform 350ms ease;
+        }
+
+        .faq-chevron.rotate {
+            transform: rotate(180deg);
+        }
+
+        /* Animasi hover card */
+        .faq-card {
+            transition:
+                border-color 250ms ease,
+                box-shadow 250ms ease,
+                transform 250ms ease;
+        }
+
+        .faq-card:hover {
+            transform: translateY(-1px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .faq-answer,
+            .faq-chevron,
+            .faq-card {
+                transition: none;
+            }
+        }
+    </style>
 
 </head>
 
@@ -96,35 +95,35 @@
 
     <!-- HEADER -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between relative">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between relative">
 
-        <!-- Kiri: Kembali ke Input NRP -->
-        <button onclick="window.location.href='{{ url('/login-mahasiswa') }}'"
-            class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-ubaya-red transition py-1.5 px-3 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Kembali ke Input NRP</span>
-        </button>
+            <!-- Kiri: Kembali ke Input NRP -->
+            <button onclick="window.location.href='{{ url('/login-mahasiswa') }}'"
+                class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-ubaya-red transition py-1.5 px-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Input NRP</span>
+            </button>
 
-        <!-- Tengah: Logo dan Judul -->
-        <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
-            <img src="{{ asset('images/bg-logoubayakms.png') }}"
-                alt="Logo UBAYA"
-                class="h-10 w-auto object-contain">
+            <!-- Tengah: Logo dan Judul -->
+            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+                <img src="{{ asset('images/bg-logoubayakms.png') }}"
+                    alt="Logo UBAYA"
+                    class="h-10 w-auto object-contain">
 
-            <span class="font-bold text-gray-900 text-base sm:text-lg whitespace-nowrap">
-                KMS FAQ UBAYA
-            </span>
+                <span class="font-bold text-gray-900 text-base sm:text-lg whitespace-nowrap">
+                    KMS FAQ UBAYA
+                </span>
+            </div>
+
+            <!-- Kanan: About Us -->
+            <button onclick="openModal('about-modal')"
+                class="text-sm font-semibold text-gray-700 hover:text-ubaya-red flex items-center gap-2 transition py-1.5 px-3 rounded-lg hover:bg-gray-100">
+                <i class="fa-solid fa-circle-info text-ubaya-red"></i>
+                <span class="hidden sm:inline">About Us</span>
+            </button>
+
         </div>
-
-        <!-- Kanan: About Us -->
-        <button onclick="openModal('about-modal')"
-            class="text-sm font-semibold text-gray-700 hover:text-ubaya-red flex items-center gap-2 transition py-1.5 px-3 rounded-lg hover:bg-gray-100">
-            <i class="fa-solid fa-circle-info text-ubaya-red"></i>
-            <span class="hidden sm:inline">About Us</span>
-        </button>
-
-    </div>
-</header>
+    </header>
 
     <!-- MAIN CONTENT -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
@@ -200,7 +199,7 @@
 
 
         <!-- FILTER KATEGORI -->
-        <div class="flex items-center justify-center gap-2 overflow-x-auto
+        <div id="category-bar" class="flex items-center justify-center gap-2 overflow-x-auto
                     py-4 mb-6 no-scrollbar">
 
             <button
@@ -236,6 +235,12 @@
         <!-- DAFTAR FAQ -->
         <div id="faq-list" class="space-y-3 max-w-3xl mx-auto">
             <!-- FAQ ditampilkan melalui JavaScript -->
+        </div>
+
+
+        <!-- PAGINATION CONTAINER -->
+        <div id="pagination-container" class="max-w-3xl mx-auto mt-6 hidden flex-col sm:flex-row items-center justify-between gap-3">
+            <!-- Tombol pagination dirender melalui JavaScript -->
         </div>
 
 
@@ -471,6 +476,8 @@
         const faqsData = @json($faqs ?? []);
 
         let activeCategory = 'All';
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 5;
 
 
         // ==============================
@@ -490,12 +497,13 @@
 
 
         // ==============================
-        // RENDER FAQ
+        // RENDER FAQ & PAGINATION
         // ==============================
         function renderFaqs() {
 
             const container = document.getElementById('faq-list');
             const emptyState = document.getElementById('empty-state');
+            const paginationContainer = document.getElementById('pagination-container');
 
             const searchKeyword = document
                 .getElementById('search-input')
@@ -506,9 +514,7 @@
             const filtered = faqsData.filter(faq => {
 
                 const category = String(faq.category ?? 'Umum').toLowerCase();
-
                 const question = String(faq.question ?? '').toLowerCase();
-
                 const answer = String(faq.answer ?? '').toLowerCase();
 
                 const matchCategory =
@@ -528,106 +534,220 @@
             if (filtered.length === 0) {
 
                 container.innerHTML = '';
-
                 emptyState.classList.remove('hidden');
+                paginationContainer.classList.add('hidden');
+                paginationContainer.classList.remove('flex');
 
                 return;
             }
 
-
             emptyState.classList.add('hidden');
 
+            // Hitung pagination (maksimal 5 data per halaman)
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
-            // Tampilkan FAQ
-            
-container.innerHTML = filtered.map(faq => `
-    <div class="faq-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:border-red-200">
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
 
-        <button
-            onclick="toggleAccordion(${faq.id})"
-            aria-expanded="false"
-            aria-controls="ans-${faq.id}"
-            id="question-${faq.id}"
-            class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 font-semibold text-gray-800 text-sm sm:text-base hover:bg-gray-50/80 transition">
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+            const paginatedFaqs = filtered.slice(startIndex, endIndex);
 
-            <div class="flex items-start gap-3">
 
-                <span class="mt-0.5 inline-block px-2.5 py-2 text-[10px] uppercase font-bold tracking-wider rounded-md bg-red-50 text-ubaya-red border border-red-100">
-                    ${faq.category}
-                </span>
+            // Tampilkan maksimal 5 FAQ
+            container.innerHTML = paginatedFaqs.map(faq => `
+                <div class="faq-card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:border-red-200">
 
-                <span class="leading-snug pt-1">
-                    ${faq.question}
-                </span>
+                    <button
+                        onclick="toggleAccordion(${faq.id})"
+                        aria-expanded="false"
+                        aria-controls="ans-${faq.id}"
+                        id="question-${faq.id}"
+                        class="w-full text-left p-4 sm:p-5 flex items-start justify-between gap-4 font-semibold text-gray-800 text-sm sm:text-base hover:bg-gray-50/80 transition">
 
-            </div>
+                        <div class="flex items-start gap-3">
 
-            <i id="icon-${faq.id}"
-                class="faq-chevron fa-solid fa-chevron-down text-gray-400 text-xs mt-2">
-            </i>
+                            <span class="mt-0.5 inline-block px-2.5 py-2 text-[10px] uppercase font-bold tracking-wider rounded-md bg-red-50 text-ubaya-red border border-red-100 whitespace-nowrap">
+                                ${escapeHtml(faq.category)}
+                            </span>
 
-        </button>
+                            <span class="leading-snug pt-1">
+                                ${escapeHtml(faq.question)}
+                            </span>
 
-        <!-- Jawaban FAQ -->
-        <div
-            id="ans-${faq.id}"
-            class="faq-answer">
+                        </div>
 
-            <div class="faq-answer-inner">
+                        <i id="icon-${faq.id}"
+                            class="faq-chevron fa-solid fa-chevron-down text-gray-400 text-xs mt-2">
+                        </i>
 
-                <div class="px-5 pb-5 pt-3 text-xs sm:text-sm text-gray-600 border-t border-gray-100 bg-gray-50/50 leading-relaxed">
+                    </button>
 
-                    <p class="mb-4">
-                        ${faq.answer}
-                    </p>
+                    <!-- Jawaban FAQ -->
+                    <div
+                        id="ans-${faq.id}"
+                        class="faq-answer">
+
+                        <div class="faq-answer-inner">
+
+                            <div class="px-5 pb-5 pt-3 text-xs sm:text-sm text-gray-600 border-t border-gray-100 bg-gray-50/50 leading-relaxed">
+
+                                <p class="whitespace-pre-line">
+                                    ${escapeHtml(faq.answer)}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
+            `).join('');
 
-            </div>
-
-        </div>
-
-    </div>
-`).join('');
+            // Render tombol pagination
+            renderPagination(totalItems, totalPages, startIndex + 1, endIndex);
+        }
 
 
+        function renderPagination(totalItems, totalPages, startItem, endItem) {
+            const paginationContainer = document.getElementById('pagination-container');
+
+            if (totalPages <= 1) {
+                paginationContainer.classList.add('hidden');
+                paginationContainer.classList.remove('flex');
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            paginationContainer.classList.remove('hidden');
+            paginationContainer.classList.add('flex');
+
+            // Tentukan daftar nomor halaman (dengan elipsis jika halaman banyak)
+            const pages = [];
+            for (let i = 1; i <= totalPages; i++) {
+                if (
+                    i === 1 ||
+                    i === totalPages ||
+                    (i >= currentPage - 1 && i <= currentPage + 1)
+                ) {
+                    pages.push(i);
+                } else if (pages[pages.length - 1] !== '...') {
+                    pages.push('...');
+                }
+            }
+
+            const prevDisabled = currentPage === 1;
+            const nextDisabled = currentPage === totalPages;
+
+            let buttonsHtml = `
+                <button
+                    type="button"
+                    onclick="goToPage(${currentPage - 1})"
+                    ${prevDisabled ? 'disabled' : ''}
+                    class="px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1 border
+                        ${prevDisabled
+                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'bg-white text-ubaya-red border-red-200 hover:bg-ubaya-red hover:text-white hover:border-ubaya-red shadow-sm'}">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                    <span>Sebelumnya</span>
+                </button>
+            `;
+
+            pages.forEach(page => {
+                if (page === '...') {
+                    buttonsHtml += `
+                        <span class="px-2 py-1.5 text-xs font-semibold text-gray-400">...</span>
+                    `;
+                } else if (page === currentPage) {
+                    buttonsHtml += `
+                        <button
+                            type="button"
+                            onclick="goToPage(${page})"
+                            class="w-9 h-9 rounded-xl text-xs font-bold bg-ubaya-red text-white shadow-sm border border-ubaya-red transition">
+                            ${page}
+                        </button>
+                    `;
+                } else {
+                    buttonsHtml += `
+                        <button
+                            type="button"
+                            onclick="goToPage(${page})"
+                            class="w-9 h-9 rounded-xl text-xs font-semibold bg-white text-gray-700 border border-gray-200 hover:border-ubaya-red hover:text-ubaya-red hover:bg-red-50 transition">
+                            ${page}
+                        </button>
+                    `;
+                }
+            });
+
+            buttonsHtml += `
+                <button
+                    type="button"
+                    onclick="goToPage(${currentPage + 1})"
+                    ${nextDisabled ? 'disabled' : ''}
+                    class="px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1 border
+                        ${nextDisabled
+                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'bg-white text-ubaya-red border-red-200 hover:bg-ubaya-red hover:text-white hover:border-ubaya-red shadow-sm'}">
+                    <span>Berikutnya</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            `;
+
+            paginationContainer.innerHTML = `
+                <p class="text-xs text-gray-500">
+                    Menampilkan <span class="font-semibold text-gray-800">${startItem}–${endItem}</span> dari <span class="font-semibold text-gray-800">${totalItems}</span> pertanyaan
+                </p>
+                <div class="flex items-center gap-1.5 flex-wrap justify-center">
+                    ${buttonsHtml}
+                </div>
+            `;
+        }
+
+
+        function goToPage(page) {
+            currentPage = page;
+            renderFaqs();
+
+            const categoryBar = document.getElementById('category-bar');
+            if (categoryBar) {
+                categoryBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
 
         // ==============================
         // ACCORDION
         // ==============================
-        
-function toggleAccordion(id) {
+        function toggleAccordion(id) {
 
-    const answer = document.getElementById(`ans-${id}`);
-    const icon = document.getElementById(`icon-${id}`);
-    const question = document.getElementById(`question-${id}`);
+            const answer = document.getElementById(`ans-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            const question = document.getElementById(`question-${id}`);
 
-    if (!answer) return;
+            if (!answer) return;
 
-    const isOpen = answer.classList.contains('open');
+            const isOpen = answer.classList.contains('open');
 
-    // Tutup dropdown
-    if (isOpen) {
+            // Tutup dropdown
+            if (isOpen) {
 
-        answer.classList.remove('open');
-        icon.classList.remove('rotate');
-        question.setAttribute('aria-expanded', 'false');
+                answer.classList.remove('open');
+                icon.classList.remove('rotate');
+                question.setAttribute('aria-expanded', 'false');
 
-    }
+            }
+            // Buka dropdown
+            else {
 
-    // Buka dropdown
-    else {
+                answer.classList.add('open');
+                icon.classList.add('rotate');
+                question.setAttribute('aria-expanded', 'true');
 
-        answer.classList.add('open');
-        icon.classList.add('rotate');
-        question.setAttribute('aria-expanded', 'true');
+            }
 
-    }
-
-}
-
+        }
 
 
         // ==============================
@@ -636,19 +756,15 @@ function toggleAccordion(id) {
         function handleSearch() {
 
             const input = document.getElementById('search-input');
-
             const clearButton = document.getElementById('clear-search');
 
             if (input.value.length > 0) {
-
                 clearButton.classList.remove('hidden');
-
             } else {
-
                 clearButton.classList.add('hidden');
-
             }
 
+            currentPage = 1;
             renderFaqs();
 
         }
@@ -657,9 +773,9 @@ function toggleAccordion(id) {
         function clearSearch() {
 
             document.getElementById('search-input').value = '';
-
             document.getElementById('clear-search').classList.add('hidden');
 
+            currentPage = 1;
             renderFaqs();
 
         }
@@ -671,6 +787,7 @@ function toggleAccordion(id) {
         function filterCategory(category) {
 
             activeCategory = category;
+            currentPage = 1;
 
             document.querySelectorAll('.cat-btn').forEach(button => {
 
@@ -699,16 +816,12 @@ function toggleAccordion(id) {
         // MODAL
         // ==============================
         function openModal(id) {
-
             document.getElementById(id).classList.remove('hidden');
-
         }
 
 
         function closeModal(id) {
-
             document.getElementById(id).classList.add('hidden');
-
         }
 
 
@@ -720,7 +833,6 @@ function toggleAccordion(id) {
         function showToast(message, isError = false) {
 
             const toast = document.getElementById('toast');
-
             const icon = toast.querySelector('i');
 
             document.getElementById('toast-message').innerText = message;
@@ -730,7 +842,6 @@ function toggleAccordion(id) {
                 : 'fa-solid fa-circle-check text-green-400 text-base';
 
             toast.classList.remove('hidden');
-
             toast.classList.add('flex');
 
             clearTimeout(toastTimeout);
@@ -738,7 +849,6 @@ function toggleAccordion(id) {
             toastTimeout = setTimeout(() => {
 
                 toast.classList.add('hidden');
-
                 toast.classList.remove('flex');
 
             }, 3000);
@@ -763,12 +873,10 @@ function toggleAccordion(id) {
             if (!question) {
 
                 showToast('Pertanyaan tidak boleh kosong.', true);
-
                 return;
             }
 
             submitButton.disabled = true;
-
             submitButton.innerText = 'Mengirim...';
 
             try {
@@ -797,9 +905,7 @@ function toggleAccordion(id) {
                 if (response.ok && data.success) {
 
                     closeModal('suggest-modal');
-
                     document.getElementById('suggestion-form').reset();
-
                     showToast(data.message);
 
                 } else {
@@ -818,7 +924,6 @@ function toggleAccordion(id) {
             } finally {
 
                 submitButton.disabled = false;
-
                 submitButton.innerText = 'Kirimkan Saran Pertanyaan';
 
             }
@@ -830,9 +935,7 @@ function toggleAccordion(id) {
         // TAMPILKAN FAQ SAAT HALAMAN DIBUKA
         // ==============================
         document.addEventListener('DOMContentLoaded', function() {
-
             renderFaqs();
-
         });
 
     </script>
